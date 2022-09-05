@@ -125,7 +125,7 @@ class ManualWrite():
             A TPCANStatus error code
         """
         ## Sends a CAN message with extended ID, and 8 data bytes
-        msgCanMessage = TPCANMsg()
+        msgCanMessage = TPCAMsg()
         msgCanMessage.ID = 0x100
         msgCanMessage.LEN = 8
         msgCanMessage.MSGTYPE = PCAN_MESSAGE_EXTENDED.value
