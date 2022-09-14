@@ -1,0 +1,171 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: BMS Third_Party_Device
+
+
+BO_ 945 MSGID_0X3B1: 8 BMS
+ SG_ Pack_Current : 7|16@0+ (0.1,0) [0|0] "Amps"  Third_Party_Device
+ SG_ Pack_Inst_Voltage : 23|16@0+ (0.1,0) [0|0] "Volts"  Third_Party_Device
+ SG_ Pack_SOC : 39|8@0+ (0.5,0) [0|0] "Percent"  Third_Party_Device
+ SG_ Relay_State : 47|16@0+ (1.0,0) [0|0] ""  Third_Party_Device
+ SG_ CRC_Checksum : 63|8@0+ (1.0,1720) [0|0] ""  Third_Party_Device
+
+BO_ 946 MSGID_0X3B2: 8 BMS
+ SG_ Pack_DCL : 7|16@0+ (1.0,0) [0|0] "Amps"  Third_Party_Device
+ SG_ Pack_CCL : 23|8@0+ (1.0,0) [0|0] "Amps"  Third_Party_Device
+ SG_ Blank : 31|8@0+ (1.0,0) [0|0] ""  Third_Party_Device
+ SG_ High_Temperature : 39|8@0+ (1.0,0) [0|0] "Celsius"  Third_Party_Device
+ SG_ Low_Temperature : 47|8@0+ (1.0,0) [0|0] "Celsius"  Third_Party_Device
+ SG_ Blank : 55|8@0+ (1.0,0) [0|0] ""  Third_Party_Device
+ SG_ CRC_Checksum : 63|8@0+ (1.0,1721) [0|0] ""  Third_Party_Device
+
+BO_ 947 MSGID_0X3B3: 4 BMS
+ SG_ DTC_P0A1F_Internal_Cell_Communication_Fault : 0|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A12_Cell_Balancing_Stuck_Off_Fault : 1|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A80_Weak_Cell_Fault : 2|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0AFA_Low_Cell_Voltage_Fault : 3|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A04_Cell_Open_Wiring_Fault : 4|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0AC0_Current_Sensor_Fault : 5|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A0D_Cell_Voltage_Over_5V_Fault : 6|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A0F_Cell_Bank_Fault : 7|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A02_Weak_Pack_Fault : 8|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A81_Fan_Monitor_Fault : 9|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A9C_Thermistor_Fault : 10|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_U0100_CAN_Communication_Fault : 11|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0560_Redundant_Power_Supply_Fault : 12|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0AA6_High_Voltage_Isolation_Fault : 13|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A05_Invalid_Input_Supply_Voltage_Fault : 14|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A06_ChargeEnable_Relay_Fault : 15|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A07_DischargeEnable_Relay_Fault : 16|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A08_Charger_Safety_Relay_Fault : 17|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A09_Internal_Hardware_Fault : 18|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A0A_Internal_Heatsink_Thermistor_Fault : 19|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A0B_Internal_Logic_Fault : 20|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A0C_Highest_Cell_Voltage_Too_High_Fault : 21|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A0E_Lowest_Cell_Voltage_Too_Low_Fault : 22|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ DTC_P0A10_Pack_Too_Hot_Fault : 23|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Balancing_Active : 24|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ MultiPurpose_Enable : 25|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Charge_Enable_Inverted : 26|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Blank : 27|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Blank : 28|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Blank : 29|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Parallel_Combined_Charge_Enable_Inverted : 30|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Parallel_Combined_Faults_Present : 31|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+
+BO_ 883 MSGID_0X373: 8 BMS
+ SG_ Low_Cell_Voltage : 0|16@1+ (0.001,0) [0|0] "Volts"  Third_Party_Device
+ SG_ High_Cell_Voltage : 16|16@1+ (0.001,0) [0|0] "Volts"  Third_Party_Device
+ SG_ Low_Temperature : 32|16@1+ (1.0,273) [0|0] "Celsius"  Third_Party_Device
+ SG_ High_Temperature : 48|16@1+ (1.0,273) [0|0] "Celsius"  Third_Party_Device
+
+BO_ 882 MSGID_0X372: 8 BMS
+ SG_ Parallel_Active_Strings : 0|8@1+ (1.0,0) [0|0] "Num"  Third_Party_Device
+ SG_ Blank : 8|8@1+ (1.0,0) [0|0] ""  Third_Party_Device
+ SG_ Blank : 16|8@1+ (1.0,273) [0|0] ""  Third_Party_Device
+ SG_ Blank : 24|8@1+ (1.0,0) [0|0] ""  Third_Party_Device
+ SG_ Blank : 32|8@1+ (10.0,0) [0|0] ""  Third_Party_Device
+ SG_ Blank : 40|8@1+ (1.0,0) [0|0] ""  Third_Party_Device
+ SG_ Blank : 55|8@0+ (1.0,0) [0|0] ""  Third_Party_Device
+ SG_ Blank : 63|8@0+ (1.0,0) [0|0] ""  Third_Party_Device
+
+BO_ 854 MSGID_0X356: 6 BMS
+ SG_ Parallel_DC_Bus_Voltage : 0|16@1+ (0.010000000000000002,0) [0|0] "Volts"  Third_Party_Device
+ SG_ Parallel_Avg_Current : 16|16@1- (1.5259021896696423E-6,0) [0|0] "Amps"  Third_Party_Device
+ SG_ High_Temperature : 32|16@1+ (0.1,0) [0|0] "Celsius"  Third_Party_Device
+
+BO_ 858 MSGID_0X35A: 8 BMS
+ SG_ Blank : 0|16@1+ (1.0,0) [0|0] ""  Third_Party_Device
+ SG_ Blank : 16|16@1+ (1.0,0) [0|0] ""  Third_Party_Device
+ SG_ Blank : 32|16@1+ (1.0,0) [0|0] ""  Third_Party_Device
+ SG_ Blank : 55|8@0+ (1.0,0) [0|0] ""  Third_Party_Device
+ SG_ Blank : 63|8@0+ (1.0,0) [0|0] ""  Third_Party_Device
+
+BO_ 853 MSGID_0X355: 6 BMS
+ SG_ Parallel_SOC : 0|16@1+ (1.0,0) [0|0] "Percent"  Third_Party_Device
+ SG_ Pack_Health : 16|16@1+ (1.0,0) [0|0] "Percent"  Third_Party_Device
+ SG_ Parallel_SOC : 32|16@1+ (0.1,0) [0|0] "Percent"  Third_Party_Device
+
+BO_ 849 MSGID_0X351: 8 BMS
+ SG_ Parallel_Target_Max_DC_PackV : 0|16@1+ (0.1,0) [0|0] "Volts"  Third_Party_Device
+ SG_ Parallel_CCL : 16|16@1+ (0.1,0) [0|0] "Amps"  Third_Party_Device
+ SG_ Parallel_DCL : 32|16@1+ (0.1,0) [0|0] "Amps"  Third_Party_Device
+ SG_ Parallel_Target_Min_DC_PackV : 48|16@1+ (0.1,0) [0|0] "Volts"  Third_Party_Device
+
+BO_ 2550587636 MSGID_0X1806E0F4: 8 BMS
+ SG_ Maximum_Pack_Voltage : 7|16@0+ (0.1,0) [0|0] "Volts"  Third_Party_Device
+ SG_ Parallel_CCL : 23|16@0+ (0.1,0) [0|0] "Amps"  Third_Party_Device
+ SG_ Blank : 32|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Blank : 33|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Blank : 34|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Blank : 35|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Blank : 36|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Blank : 37|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Blank : 38|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Charger_Safety_Inverted : 39|1@1+ (1.0,0) [0|1] ""  Third_Party_Device
+ SG_ Blank : 47|8@0+ (1.0,0) [0|0] ""  Third_Party_Device
+ SG_ Blank : 55|8@0+ (1.0,0) [0|0] ""  Third_Party_Device
+ SG_ Blank : 63|8@0+ (1.0,0) [0|0] ""  Third_Party_Device
+
+BO_ 2566869216 MSGID_0X18FF50E0: 8 Third_Party_Device
+ SG_ Blank : 7|8@0+ (1.0,0) [0|0] ""  BMS
+ SG_ Blank : 15|8@0+ (1.0,0) [0|0] ""  BMS
+ SG_ Blank : 23|8@0+ (1.0,0) [0|0] ""  BMS
+ SG_ Blank : 31|8@0+ (1.0,0) [0|0] ""  BMS
+ SG_ Blank : 39|8@0+ (1.0,0) [0|0] ""  BMS
+ SG_ AC_Input_Voltage : 47|8@0+ (1.0,0) [0|0] ""  BMS
+ SG_ Blank : 55|8@0+ (1.0,0) [0|0] ""  BMS
+ SG_ Blank : 63|8@0+ (1.0,0) [0|0] ""  BMS
+
+BO_ 227 MSGID_0XE3_CELLBCAST: 8 BMS
+ SG_ CellId : 7|8@0+ (1,0) [0|0] "#" Third_Party_Device
+ SG_ CellVoltage : 15|16@0+ (0.0001,0) [0|0] "Volts" Third_Party_Device
+ SG_ CellResistance : 30|15@0+ (0.01,0) [0|0] "mOhms" Third_Party_Device
+ SG_ CellOpenVoltage : 47|16@0+ (0.0001,0) [0|0] "Volts" Third_Party_Device
+ SG_ Checksum : 63|8@0+ (1,0) [0|0] "" Third_Party_Device
+ SG_ CellBalancing : 31|1@1+ (1,0) [0|0] "" Third_Party_Device
+CM_ BO_ 945 "This ID Transmits at 104 ms.";
+CM_ BO_ 946 "This ID Transmits at 104 ms.";
+CM_ BO_ 947 "This ID Transmits at 104 ms.";
+CM_ BO_ 883 "This ID Transmits at 104 ms.";
+CM_ BO_ 882 "This ID Transmits at 104 ms.";
+CM_ BO_ 854 "This ID Transmits at 104 ms.";
+CM_ BO_ 858 "This ID Transmits at 104 ms.";
+CM_ BO_ 853 "This ID Transmits at 104 ms.";
+CM_ BO_ 849 "This ID Transmits at 104 ms.";
+CM_ BO_ 2550587636 "This ID Transmits at 808 ms.";
+CM_ BO_ 227 "This ID Transmits at 100 ms.";
+CM_ SG_ 227 Checksum "Value = (0xE3 + 8 + byte0 + byte1 + ... + byte6) & 0xFF";

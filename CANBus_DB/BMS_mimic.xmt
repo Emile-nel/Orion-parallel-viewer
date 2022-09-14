@@ -1,0 +1,20 @@
+; C:\Users\emile\Documents\GitHub\Oroin-parallel-viewer\CANBus_DB\BMS_mimic.xmt
+;   CAN messages saved by PCAN-View v5.0.2.838
+;
+; Columns descriptions:
+; ~~~~~~~~~~~~~~~~~~~~~
+; +Message ID
+; |            +Cycle time in ms (0=manual)
+; |            |  +Data length
+; |            |  |  +Frame type
+; |            |  |  |  +Message data
+; |            |  |  |  |
+351h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h
+355h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h
+356h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h
+35Ah         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h
+3B1h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h ; master custom 1
+3B2h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h ; master custom 2
+3B3h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h
+1806E0F4h    250  8  D 00h 00h 00h 00h 00h 00h 00h 00h
+18FF50E0h    250  8  D 00h 00h 00h 00h 00h 18h 00h 00h ; StealthEv AC voltage

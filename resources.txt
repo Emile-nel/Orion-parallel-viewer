@@ -13,7 +13,7 @@ https://www.amazon.com/VCE-Combos-Supported-Degree-Adapter/dp/B06XD7RHJD/ref=sr_
 
 Waveshare
 
-https://www.waveshare.com/5inch-hdmi-amoled.htm
+c
 https://www.waveshare.com/pi4b-starter-kit.htm?sku=18093
 https://www.waveshare.com/rs485-can-hat.htm
 https://www.waveshare.com/hdmi-dual-male-cable.htm
