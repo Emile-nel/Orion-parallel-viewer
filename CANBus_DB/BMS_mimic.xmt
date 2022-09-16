@@ -9,12 +9,13 @@
 ; |            |  |  +Frame type
 ; |            |  |  |  +Message data
 ; |            |  |  |  |
-351h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h
-355h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h
-356h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h
-35Ah         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h
-3B1h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h ; master custom 1
-3B2h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h ; master custom 2
-3B3h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h
-1806E0F4h    250  8  D 00h 00h 00h 00h 00h 00h 00h 00h
-18FF50E0h    250  8  D 00h 00h 00h 00h 00h 18h 00h 00h ; StealthEv AC voltage
+351h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h  Paused
+355h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h  Paused
+356h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h  Paused
+35Ah         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h  Paused
+3B1h         250  8  D FFh F7h 05h DBh C7h 40h C4h 59h  Paused ; master custom 1
+3B2h         250  8  D 00h 87h 00h 03h 20h 1Fh 00h 82h  Paused ; master custom 2
+3B3h         250  8  D 00h 00h 00h 00h 00h 00h 00h 00h  Paused ; master custom 3
+7E3h        1000  8  D 02h 22h F0h 46h 00h 00h 00h 00h
+1806E0F4h    250  8  D 00h 00h 00h 00h 00h 00h 00h 00h  Paused
+18FF50E0h    250  8  D 00h 00h 00h 00h 00h 18h 00h 00h  Paused ; StealthEv AC voltage
