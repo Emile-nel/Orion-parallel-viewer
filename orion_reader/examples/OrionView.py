@@ -82,29 +82,29 @@ class BMSUnit:
 
     def set_val(self,name,value):
         #Grab and store BMS Unit values
-        match name:
-            case 'Pack_Current'   :
-                self.instantVoltage = value                     
-            case 'Inst_Voltage'   :                      
-                self.packCurrent    = value  
-            case 'Pack_SOC'   :                          
-                self.packSOC        = value  
-            case 'Relay_State'    :   
-                self.packSOC        = value                    
-            case 'Pack_DCL'   :
-                self.packDCL        = value                         
-            case 'Pack_CCL'   : 
-                self.packCCL        = value                    
-            case 'High_Temperature'   :                  
-                self.highTemp       = value
-            case 'Low_Temperature'    :                                   
-                self.lowTemp        = value
-            case 'Balancing_Active'  :                         
-                self.isBalancing    = value
-            case 'MultiPurpose_Enable'   :                      
-                self.relayState     = value
-            case 'Charge Enable Inverted'    :                   
-                self.allowCharge    = value
+       
+        if name == 'Pack_Current':
+            self.instantVoltage = value                     
+        elif name == 'Inst_Voltage'   :                      
+            self.packCurrent    = value  
+        elif name == 'Pack_SOC'   :                          
+            self.packSOC        = value  
+        elif name == 'Relay_State'    :   
+            self.packSOC        = value                    
+        elif name == 'Pack_DCL'   :
+            self.packDCL        = value                         
+        elif name == 'Pack_CCL'   : 
+            self.packCCL        = value                    
+        elif name == 'High_Temperature'   :                  
+            self.highTemp       = value
+        elif name == 'Low_Temperature'    :                                   
+            self.lowTemp        = value
+        elif name == 'Balancing_Active'  :                         
+            self.isBalancing    = value
+        elif name == 'MultiPurpose_Enable'   :                      
+            self.relayState     = value
+        elif name == 'Charge Enable Inverted'    :                   
+            self.allowCharge    = value
            
         #BMS fault handling
         faultKeys = list(self.faultList.keys)
