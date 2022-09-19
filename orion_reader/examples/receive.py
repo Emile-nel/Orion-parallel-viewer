@@ -1,4 +1,5 @@
 
+from mimetypes import init
 import os
 from enum import Enum
 #from pyexpat.errors import messages
@@ -12,6 +13,7 @@ import traceback
 from datetime import datetime
 
 import tkinter as tk
+import OrionView
 
 ws = tk.Tk()
 
@@ -42,80 +44,6 @@ id_list = [0x3b1,0x3b2,0x3b3]
 id_read =[]
 msg_list = []
 
-class BitOrder(Enum):
-    LSB = 0
-    MSB = 1
-
-class ByteOrder(Enum):
-    LittleEndian = "little"
-    BigEndian = "big"
-
-class CANMessage:
-
-
-    
-    def __init__(self, name, id,startBit,len=8,bitOrder=BitOrder.MSB,byteOrder=ByteOrder.BigEndian,factor=1,value=None, timeStamp =None):
-        self.name       = name      #Message name as a string   
-        self.id         = id        #Message ID
-        self.startBit  = startBit   #Message startBit in message
-        self.len        = len       #Length of message in bits(default = 8)
-        self.bitOrder   = bitOrder  #bit order of Byte, either 0 = LSB or 1 = MSB(default)
-        self.byteOrder  = byteOrder #byte order of message, either 0 = LittleEndian, 1 = BigEndian(default)
-        self.factor     = factor    #Multiplication factor of message
-        self.value      = value     
-        self.timeStamp  = timeStamp
-
-    def set_val(self,data,messageTime):
-        #get the byte position of the message [0 --> 7]
-        bytePos = int(self.startBit / 8)
-
-
-        try:
-            if self.len == 1:
-                bitPos = self.startBit - 8*bytePos
-                bitState = bool(int(data[bytePos])&(1<<bitPos))
-                self.value = bitState
-                
-                
-
-                # if bitState:
-                    
-                    # print('id : ' + str(self.id))
-                    # print('Byte Position : ' + str(bytePos))
-                    # print('byte Value : ' + str(data[bytePos]))
-                
-                    # print(data)
-                    # print('Bit Position : ' + str(bitPos))
-                    # print(str(bitState) + ' ' + (self.name))
-
-
-
-            else:
-                # get the number of bytes for the message
-                byteNum = int(self.len / 8)
-                if byteNum == 1:
-                    self.value = data[bytePos]*self.factor
-                else:
-                    valueInts = data[bytePos:byteNum+bytePos]
-                    ValueBytes = bytes(valueInts)
-                    if self.byteOrder == ByteOrder.BigEndian:
-                        self.value = int.from_bytes(ValueBytes,"big")*self.factor
-                    else:
-                        self.value = int.from_bytes(ValueBytes,"little")*self.factor
-
-                # if self.id == 0x3b1:
-                #     print('id : ' + str(self.id))
-                #     print('Byte Position : ' + str(bytePos))
-                #     print((data))
-                #     print('Value : ' + str(self.value))
-
-   
-            
-            #if the above succeeds... 
-            self.timeStamp = messageTime
-            return self.value
-        except:
-            print('There was an error')
 
 
       
@@ -126,63 +54,47 @@ CANMsgs_Master = [
 # CANMessage('Broadcast_Cell_Resistance',     0xe3,24,16,BitOrder.MSB,ByteOrder.BigEndian,0.01),  #Units in mOhm 
 # CANMessage('Broadcast_Cell_Open_Voltage',   0xe3,40,16,BitOrder.MSB,ByteOrder.BigEndian,0.1),   #Units in mV
     #0x3b1
-CANMessage('Master_Pack_Current',      0x3b1,0,16,BitOrder.MSB,ByteOrder.BigEndian,0.1),
-CANMessage('Master_Inst_Voltage',      0x3b1,16,16,BitOrder.MSB,ByteOrder.BigEndian,0.1),
-CANMessage('Master_Pack_SOC',          0x3b1,32,8,BitOrder.MSB,ByteOrder.BigEndian,0.5),
-CANMessage('Master_Relay_State',       0x3b1,40,8,BitOrder.MSB,ByteOrder.BigEndian,1),
+OrionView.CANMessage('Master_Pack_Current',                       0x3b1,0,16,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,0.1),
+OrionView.CANMessage('Master_Inst_Voltage',                       0x3b1,16,16,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,0.1),
+OrionView.CANMessage('Master_Pack_SOC',                           0x3b1,32,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,0.5),
+OrionView.CANMessage('Master_Relay_State',                        0x3b1,40,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
     #0x3b2
-CANMessage('Master_Pack_DCL',          0x3b2,0,16,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Master_Pack_CCL',          0x3b2,16,8,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Master_High_Temperature',  0x3b2,32,8,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Master_Low_Temperature',   0x3b2,40,8,BitOrder.MSB,ByteOrder.BigEndian,1),
+OrionView.CANMessage('Master_Pack_DCL',                           0x3b2,0,16,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('Master_Pack_CCL',                           0x3b2,16,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('Master_High_Temperature',                   0x3b2,32,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('Master_Low_Temperature',                    0x3b2,40,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
     #0x3b3 - unit error messages
-CANMessage('DTC P0A1F : Internal Cell Communication',   0x3b3,0,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
-CANMessage('DTC P0A12 : Cell Balancing Stuck Off',      0x3b3,1,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('DTC P0A80 : Weak Cell',                     0x3b3,2,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('DTC P0AFA : Low Cell Voltage',              0x3b3,3,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('DTC P0A04 : Cell Open Wiring',              0x3b3,4,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('DTC P0AC0 : Current Sensor',                0x3b3,5,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('DTC P0A0D : Cell Voltage Over 5V',          0x3b3,6,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('DTC P0A0F : Cell Bank',                     0x3b3,7,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('DTC P0A02 : Weak Pack',                     0x3b3,8,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('DTC P0A81 : Fan Monitor',                   0x3b3,9,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('DTC P0A9C : Thermistor',                    0x3b3,10,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('DTC U0100 : CAN Communication',             0x3b3,11,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('DTC P0560 : Redundant Power Supply',        0x3b3,12,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('DTC P0AA6 : High Voltage Isolation',        0x3b3,13,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('DTC P0A05 : Invalid Input Supply Voltage',  0x3b3,14,1,BitOrder.MSB,ByteOrder.BigEndian,1),  
-CANMessage('DTC P0A06 : ChargeEnable Relay',            0x3b3,15,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
-CANMessage('DTC P0A07 : DischargeEnable Relay',         0x3b3,16,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
-CANMessage('DTC P0A08 : Charger Safety Relay',          0x3b3,17,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
-CANMessage('DTC P0A09 : Internal Hardware',             0x3b3,18,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
-CANMessage('DTC P0A0A : Internal Heatsink Thermistor',  0x3b3,19,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
-CANMessage('DTC P0A0B : Internal Logic',                0x3b3,20,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
-CANMessage('DTC P0A0C : Highest Cell Voltage Too High', 0x3b3,21,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
-CANMessage('DTC P0A0E : Lowest Cell Voltage Too Low',   0x3b3,22,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
-CANMessage('DTC P0A10 : Pack Too Hot',                  0x3b3,23,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
-CANMessage('Balancing_Active',                          0x3b3,24,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
-CANMessage('MultiPurpose_Enable',                       0x3b3,25,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
-CANMessage('Charge Enable Inverted',                    0x3b3,26,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC P0A1F : Internal Cell Communication',   0x3b3,0,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+OrionView.CANMessage('DTC P0A12 : Cell Balancing Stuck Off',      0x3b3,1,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC P0A80 : Weak Cell',                     0x3b3,2,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC P0AFA : Low Cell Voltage',              0x3b3,3,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC P0A04 : Cell Open Wiring',              0x3b3,4,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC P0AC0 : Current Sensor',                0x3b3,5,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC P0A0D : Cell Voltage Over 5V',          0x3b3,6,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC P0A0F : Cell Bank',                     0x3b3,7,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC P0A02 : Weak Pack',                     0x3b3,8,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC P0A81 : Fan Monitor',                   0x3b3,9,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC P0A9C : Thermistor',                    0x3b3,10,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC U0100 : CAN Communication',             0x3b3,11,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC P0560 : Redundant Power Supply',        0x3b3,12,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC P0AA6 : High Voltage Isolation',        0x3b3,13,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('DTC P0A05 : Invalid Input Supply Voltage',  0x3b3,14,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),  
+OrionView.CANMessage('DTC P0A06 : ChargeEnable Relay',            0x3b3,15,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+OrionView.CANMessage('DTC P0A07 : DischargeEnable Relay',         0x3b3,16,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+OrionView.CANMessage('DTC P0A08 : Charger Safety Relay',          0x3b3,17,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+OrionView.CANMessage('DTC P0A09 : Internal Hardware',             0x3b3,18,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+OrionView.CANMessage('DTC P0A0A : Internal Heatsink Thermistor',  0x3b3,19,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+OrionView.CANMessage('DTC P0A0B : Internal Logic',                0x3b3,20,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+OrionView.CANMessage('DTC P0A0C : Highest Cell Voltage Too High', 0x3b3,21,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+OrionView.CANMessage('DTC P0A0E : Lowest Cell Voltage Too Low',   0x3b3,22,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+OrionView.CANMessage('DTC P0A10 : Pack Too Hot',                  0x3b3,23,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+OrionView.CANMessage('Balancing_Active',                          0x3b3,24,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+OrionView.CANMessage('MultiPurpose_Enable',                       0x3b3,25,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+OrionView.CANMessage('Charge Enable Inverted',                    0x3b3,26,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
     #0x3b3 - Parallel string specific error messages
-CANMessage('Parallel Combined Charge Enable Inverted',0x3b3,30,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
-CANMessage('Parallel Combined Faults Present',0x3b3,31,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+OrionView.CANMessage('Parallel Combined Charge Enable Inverted',  0x3b3,30,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+OrionView.CANMessage('Parallel Combined Faults Present',          0x3b3,31,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
 
-CANMessage('Parallel Combined Faults Present',227,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',853,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',849,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',858,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',854,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',852,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',896,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',882,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',883,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',897,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',884,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',886,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',887,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',889,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',885,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
-CANMessage('Parallel Combined Faults Present',4,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
 ]
 
 def process_cell_broadcast(messageId,messageData):
