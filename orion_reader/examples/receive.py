@@ -5,7 +5,7 @@ from enum import Enum
 #from pyexpat.errors import messages
 #from tkinter import Listbox
 #from xml.dom.expatbuilder import FragmentBuilder
-import can
+import can #sudo apt install python3-can
 import threading
 import sys
 import curses
@@ -54,16 +54,14 @@ CANMsgs_Master = [
 # CANMessage('Broadcast_Cell_Resistance',     0xe3,24,16,BitOrder.MSB,ByteOrder.BigEndian,0.01),  #Units in mOhm 
 # CANMessage('Broadcast_Cell_Open_Voltage',   0xe3,40,16,BitOrder.MSB,ByteOrder.BigEndian,0.1),   #Units in mV
     #0x3b1
-OrionView.CANMessage('Master_Pack_Current',                       0x3b1,0,16,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,0.1),
-OrionView.CANMessage('Master_Inst_Voltage',                       0x3b1,16,16,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,0.1),
-OrionView.CANMessage('Master_Pack_SOC',                           0x3b1,32,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,0.5),
-OrionView.CANMessage('Master_Relay_State',                        0x3b1,40,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-    #0x3b2
-OrionView.CANMessage('Master_Pack_DCL',                           0x3b2,0,16,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('Master_Pack_CCL',                           0x3b2,16,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('Master_High_Temperature',                   0x3b2,32,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('Master_Low_Temperature',                    0x3b2,40,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-    #0x3b3 - unit error messages
+OrionView.CANMessage('Pack_Current',                              0x3b1,0,16,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,0.1),
+OrionView.CANMessage('Inst_Voltage',                              0x3b1,16,16,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,0.1),
+OrionView.CANMessage('Pack_SOC',                                  0x3b1,32,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,0.5),
+OrionView.CANMessage('Relay_State',                               0x3b1,40,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('Pack_DCL',                                  0x3b2,0,16,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('Pack_CCL',                                  0x3b2,16,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('High_Temperature',                          0x3b2,32,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
+OrionView.CANMessage('Low_Temperature',                           0x3b2,40,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
 OrionView.CANMessage('DTC P0A1F : Internal Cell Communication',   0x3b3,0,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
 OrionView.CANMessage('DTC P0A12 : Cell Balancing Stuck Off',      0x3b3,1,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
 OrionView.CANMessage('DTC P0A80 : Weak Cell',                     0x3b3,2,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
@@ -91,11 +89,25 @@ OrionView.CANMessage('DTC P0A10 : Pack Too Hot',                  0x3b3,23,1,Ori
 OrionView.CANMessage('Balancing_Active',                          0x3b3,24,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
 OrionView.CANMessage('MultiPurpose_Enable',                       0x3b3,25,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
 OrionView.CANMessage('Charge Enable Inverted',                    0x3b3,26,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-    #0x3b3 - Parallel string specific error messages
 OrionView.CANMessage('Parallel Combined Charge Enable Inverted',  0x3b3,30,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
 OrionView.CANMessage('Parallel Combined Faults Present',          0x3b3,31,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+#parallel bus voltage
+#parallel current
+#parallel charge anable
+#parallel dcl
+#parallel ccl
+#parallel high temp
+#parallel low temp
+#parallel high cell 
+#parallel low cell
 
 ]
+
+
+BMS_Master = OrionView.BMSUnit()
+BMS_Slave1 = OrionView.BMSUnit()
+BMS_Slave2 = OrionView.BMSUnit()
+BMS_Slave3 = OrionView.BMSUnit()
 
 def process_cell_broadcast(messageId,messageData):
     

@@ -1,4 +1,6 @@
 
+from enum import Enum
+
 
 
 class BitOrder(Enum):
@@ -10,7 +12,8 @@ class ByteOrder(Enum):
     BigEndian = "big"
 
 
-class BMSInfo:
+
+class BMSUnit:
     def __init__(self,
     unitType        = 0,# = master, 1= slave
     instantVoltage  = 0,
@@ -20,30 +23,105 @@ class BMSInfo:
     packCCL         = 0,
     relayState      = False,
     isFault         = False,
-    faultList       = [],
+    allowCharge     = False,
+    faultList       = {
+        'DTC P0A1F : Internal Cell Communication'   :   False,  
+        'DTC P0A12 : Cell Balancing Stuck Off'      :   False,      
+        'DTC P0A80 : Weak Cell'                     :   False,                    
+        'DTC P0AFA : Low Cell Voltage'              :   False,             
+        'DTC P0A04 : Cell Open Wiring'              :   False,             
+        'DTC P0AC0 : Current Sensor'                :   False,               
+        'DTC P0A0D : Cell Voltage Over 5V'          :   False,         
+        'DTC P0A0F : Cell Bank'                     :   False,                    
+        'DTC P0A02 : Weak Pack'                     :   False,                    
+        'DTC P0A81 : Fan Monitor'                   :   False,                        
+        'DTC P0A9C : Thermistor'                    :   False,                   
+        'DTC U0100 : CAN Communication'             :   False,            
+        'DTC P0560 : Redundant Power Supply'        :   False,       
+        'DTC P0AA6 : High Voltage Isolation'        :   False,       
+        'DTC P0A05 : Invalid Input Supply Voltage'  :   False, 
+        'DTC P0A06 : ChargeEnable Relay'            :   False,           
+        'DTC P0A07 : DischargeEnable Relay'         :   False,        
+        'DTC P0A08 : Charger Safety Relay'          :   False,         
+        'DTC P0A09 : Internal Hardware'             :   False,            
+        'DTC P0A0A : Internal Heatsink Thermistor'  :   False, 
+        'DTC P0A0B : Internal Logic'                :   False,               
+        'DTC P0A0C : Highest Cell Voltage Too High' :   False,
+        'DTC P0A0E : Lowest Cell Voltage Too Low'   :   False,  
+        'DTC P0A10 : Pack Too Hot'                  :   False,                 
+    },
     highCellVoltage = 0,
     highCellId      = 0,
     lowCellVoltage  = 0,
     lowCellId       = 0,
+    isBalancing     = False,
     highTemp        = 0,
     lowTemp         = 0,
     heatSinkTemp    = 0,
     lastOnline      = None,
        ) -> None:
-        self.instantVoltage     = instantVoltage ,
-        self.packCurrent        = packCurrent    ,
-        self.packSOC            = packSOC        ,
-        self.relayState         = relayState     ,
-        self.isFault            = isFault        ,
-        self.faultList          = faultList      ,
-        self.highCellVoltage    = highCellVoltage,
-        self.highCellId         = highCellId     ,
-        self.lowCellVoltage     = lowCellVoltage ,
-        self.lowCellId          = lowCellId      ,
-        self.highTemp           = highTemp       ,
-        self.lowTemp            = lowTemp        ,
-        self.heatSinkTemp       = heatSinkTemp   ,
-        self.lastOnline         = lastOnline     ,
+        self.unitType           = unitType          ,
+        self.instantVoltage     = instantVoltage    ,
+        self.packCurrent        = packCurrent       ,
+        self.packSOC            = packSOC           ,
+        self.packDCL            = packDCL           ,
+        self.packCCL            = packCCL           ,
+        self.relayState         = relayState        ,
+        self.isFault            = isFault           ,
+        self.allowCharge        = allowCharge       ,
+        self.faultList          = faultList         ,
+        self.highCellVoltage    = highCellVoltage   ,
+        self.highCellId         = highCellId        ,
+        self.lowCellVoltage     = lowCellVoltage    ,
+        self.lowCellId          = lowCellId         ,
+        self.isBalancing        = isBalancing       ,
+        self.highTemp           = highTemp          ,
+        self.lowTemp            = lowTemp           ,
+        self.heatSinkTemp       = heatSinkTemp      ,
+        self.lastOnline         = lastOnline        ,
+
+    def set_val(self,name,value):
+        #Grab and store BMS Unit values
+        match name:
+            case 'Pack_Current'   :
+                self.instantVoltage = value                     
+            case 'Inst_Voltage'   :                      
+                self.packCurrent    = value  
+            case 'Pack_SOC'   :                          
+                self.packSOC        = value  
+            case 'Relay_State'    :   
+                self.packSOC        = value                    
+            case 'Pack_DCL'   :
+                self.packDCL        = value                         
+            case 'Pack_CCL'   : 
+                self.packCCL        = value                    
+            case 'High_Temperature'   :                  
+                self.highTemp       = value
+            case 'Low_Temperature'    :                                   
+                self.lowTemp        = value
+            case 'Balancing_Active'  :                         
+                self.isBalancing    = value
+            case 'MultiPurpose_Enable'   :                      
+                self.relayState     = value
+            case 'Charge Enable Inverted'    :                   
+                self.allowCharge    = value
+           
+        #BMS fault handling
+        faultKeys = list(self.faultList.keys)
+        if name in faultKeys:
+            self.faultList[name] = value
+            if value:
+                self.isFault = True
+        #clear isfault if none of the faults are present anymore
+        if self.isFault:
+            isFaultCheck = False
+            for key in faultKeys:
+                isFaultCheck = isFaultCheck & self.faultList[key]
+
+
+class CombinedBMSUnit(BMSUnit):
+    def __init__(self,combinedDCL,combinedCCL,) -> None:
+        pass
 
 class CANMessage:
 
