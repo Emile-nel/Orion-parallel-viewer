@@ -24,9 +24,11 @@ stop_bus = threading.Event()
 thread_exception = None
 
 can_messages    = {}
-cell_info       = []
-for i in range(1,45,1):
-    cell_info.append({'Broadcast_Cell_ID':i,'Broadcast_Cell_Intant_Voltage': 0.0, 'Broadcast_Cell_Resistance': 0.0,'Broadcast_Cell_Open_Voltage' : 0.0})
+cell_info       = {0xe3:[],0xe4:[],0xe5:[],0xe6:[]}
+#Create an ampty list for master to slave3 
+for u in range(0,4,1):
+    for i in range(1,45,1):
+        cell_info[0xe3+u].append({'Broadcast_Cell_ID':i,'Broadcast_Cell_Intant_Voltage': 0.0, 'Broadcast_Cell_Resistance': 0.0,'Broadcast_Cell_Open_Voltage' : 0.0})
 
 
 
@@ -183,9 +185,36 @@ CANMessage('Parallel Combined Faults Present',885,31,1,BitOrder.MSB,ByteOrder.Bi
 CANMessage('Parallel Combined Faults Present',4,31,1,BitOrder.MSB,ByteOrder.BigEndian,1),
 ]
 
+def process_cell_broadcast(messageId,messageData):
+    
+        #Extract the cell ID
+        cellId          = messageData[0]
+        #Extract instant voltage in mV
+        valueInts       = messageData[1:3]
+        ValueBytes      = bytes(valueInts)
+        cellInstVoltage = int.from_bytes(ValueBytes,"big")*0.1
+        #Extract Cell resistance in mOhm
+        valueInts       = messageData[3:5]
+        ValueBytes      = bytes(valueInts)
+        cellResistance  = int.from_bytes(ValueBytes,"big")*0.01
+        #Extract Cell Open Voltage in mV
+        valueInts       = messageData[5:7]
+        ValueBytes      = bytes(valueInts)
+        cellOpenVoltage = int.from_bytes(ValueBytes,"big")*0.1
+        #Append cell info list for master unit
+        cell_info[messageId][cellId - 1]['Broadcast_Cell_ID'] = cellId
+        cell_info[messageId][cellId - 1]['Broadcast_Cell_Intant_Voltage'] = cellInstVoltage
+        cell_info[messageId][cellId - 1]['Broadcast_Cell_Resistance'] = cellResistance
+        cell_info[messageId][cellId - 1]['Broadcast_Cell_Open_Voltage'] = cellOpenVoltage
+
+
 
 def clear_fault_codes(unitId):
     #use unitId of 0x7df to clear DTC faults on all units
+    #0x7e3 - Master
+    #0x7e4 - Slave1
+    #0x7e5 - Slave2
+    #0x7e6 - Slave3
 
     # OBDII Message structure arbitration_id=PID_REQUEST,data=[0x02 [ message length],0x01 [service code],Parameter PID,0x00,0x00,0x00,0x00,0x00],extended_id=False
 
@@ -234,29 +263,14 @@ def bus_run_loop(bus_device):
 
             try: 
                 # frame_id = int(frame[1][3:]) # get the ID from the 'ID=246' string
-                #Check if can ID is in whitelist and do some stuff with it if it is. Else, leave it alone
-
-                if messageId == 0xe3:
-                    cellId          = messageData[0]
-                    #Extract instant voltage in mV
-                    valueInts = messageData[1:3]
-                    ValueBytes = bytes(valueInts)
-                    cellInstVoltage = int.from_bytes(ValueBytes,"big")*0.1
-                    #Extract Cell resistance in mOhm
-                    valueInts = messageData[3:5]
-                    ValueBytes = bytes(valueInts)
-                    cellResistance = int.from_bytes(ValueBytes,"big")*0.01
-                    #Extract Cell Open Voltage in mV
-                    valueInts = messageData[5:7]
-                    ValueBytes = bytes(valueInts)
-                    cellOpenVoltage = int.from_bytes(ValueBytes,"big")*0.1
-                    #update cell info list
-
-                    cell_info[cellId - 1]['Broadcast_Cell_ID'] = cellId
-                    cell_info[cellId - 1]['Broadcast_Cell_Intant_Voltage'] = cellInstVoltage
-                    cell_info[cellId - 1]['Broadcast_Cell_Resistance'] = cellResistance
-                    cell_info[cellId - 1]['Broadcast_Cell_Open_Voltage'] = cellOpenVoltage                        
+                
+                #Process cell broadcast message. 
+                cell_broadcast_ids = [0xe3,0xe4,0xe5,0xe6] 
+                if messageId in cell_broadcast_ids:
+                    process_cell_broadcast(messageId,messageData)
                       
+
+               #Check if can ID is in whitelist and do some stuff with it if it is. Else, leave it alone
                 if messageId in WHITELIST_IDs:
                     #convert the hex strings array to an integer array
                     # data = [byte for byte in frame[3:]]
@@ -264,56 +278,11 @@ def bus_run_loop(bus_device):
                     #Sanity check
                     #data = [byte for byte in data if byte >= 0 and byte <= 255] 
                     # print(data)
-                    
-
                     for message in CANMsgs_Master:
                         
                         if messageId == message.id:
                             message.set_val(messageData,messageTime)
-
-
-
-
-
-                    #Iterate aga ---- Come back to at a later stage 
-                    # for message in CANMsgs_Master:
-                    #     while message.id == 0xe3:
-                    #         if message.value == None: #Break the for loop because no cell values have been read yet
-                    #             break
-                    #         #print(message.value)
-                    #         if message.name == 'Broadcast_Cell_ID':
-                    #             self.cellId          = message.value
-                    #             print(cellId)
-                    #         if message.name == 'Broadcast_Cell_Intant_Voltage':
-                    #             cellInstVoltage = message.value
-                    #             print(cellInstVoltage)
-                    #         if message.name == 'Broadcast_Cell_Resistance':
-                    #             cellResistance  = message.value
-                    #             print(cellResistance)
-                    #         if message.name == 'Broadcast_Cell_Open_Voltage':
-                    #             cellOpenVoltage = message.value
-                    #             print(cellOpenVoltage)
-                    #         #if cellId & cellInstVoltage & cellResistance & cellOpenVoltage:
-                    #         if len(cell_info) < cellId: #Append the list if the current cell info has not been added yet
-                    #             cell_info.append({'Broadcast_Cell_ID':cellId,'Broadcast_Cell_Intant_Voltage': cellInstVoltage, 'Broadcast_Cell_Resistance': cellResistance,'Broadcast_Cell_Open_Voltage' : cellOpenVoltage})
-                    #         elif len(cell_info) == cellId: #Modify the list if the current cell in the list is being read,. 
-                    #             cell_info[cellId - 1]['Broadcast_Cell_ID'] = cellId
-                    #             cell_info[cellId - 1]['Broadcast_Cell_Intant_Voltage'] = cellInstVoltage
-                    #             cell_info[cellId - 1]['Broadcast_Cell_Resistance'] = cellResistance
-                    #             cell_info[cellId - 1]['Broadcast_Cell_Open_Voltage'] = cellOpenVoltage
-                    #         else:
-                    #             print('Clearly something is kinda F##$ed Up')
-                    #         #Set temp cell info to zero to make way for next cell
-                    #         print(cell_info[cellId - 1])
-                    #         cellId          = 0
-                    #         cellInstVoltage = 0
-                    #         cellResistance  = 0
-                    #         cellOpenVoltage = 0   
-                            
-                           
-
-                           
-                             
+       
             except Exception as e:
                 print(e)
                 
