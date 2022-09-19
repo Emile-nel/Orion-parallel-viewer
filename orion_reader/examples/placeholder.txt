@@ -1,0 +1,48 @@
+
+
+OrionView.CANMessage('Master_Pack_Current',                      
+'Master_Inst_Voltage',                      
+'Master_Pack_SOC',                          
+'Master_Relay_State',                       
+
+OrionView.CANMessage('Master_Pack_DCL',                          
+'Master_Pack_CCL',                          
+'Master_High_Temperature',                  
+'Master_Low_Temperature',                   
+or messages
+OrionView.CANMessage('DTC P0A1F : Internal Cell Communication',  
+'DTC P0A12 : Cell Balancing Stuck Off',     
+'DTC P0A80 : Weak Cell',                    
+'DTC P0AFA : Low Cell Voltage',             
+'DTC P0A04 : Cell Open Wiring',             
+'DTC P0AC0 : Current Sensor',               
+'DTC P0A0D : Cell Voltage Over 5V',         
+'DTC P0A0F : Cell Bank',                    
+'DTC P0A02 : Weak Pack',                    
+'DTC P0A81 : Fan Monitor',                  
+'DTC P0A9C : Thermistor',                   
+'DTC U0100 : CAN Communication',            
+'DTC P0560 : Redundant Power Supply',       
+'DTC P0AA6 : High Voltage Isolation',       
+'DTC P0A05 : Invalid Input Supply Voltage', 
+'DTC P0A06 : ChargeEnable Relay',           
+'DTC P0A07 : DischargeEnable Relay',        
+'DTC P0A08 : Charger Safety Relay',         
+'DTC P0A09 : Internal Hardware',            
+'DTC P0A0A : Internal Heatsink Thermistor', 
+'DTC P0A0B : Internal Logic',               
+'DTC P0A0C : Highest Cell Voltage Too High',
+'DTC P0A0E : Lowest Cell Voltage Too Low',  
+'DTC P0A10 : Pack Too Hot',                 
+'Balancing_Active',                         
+'MultiPurpose_Enable',                      
+'Charge Enable Inverted',                   
+ string specific error messages
+OrionView.CA
+'Parallel Combined Charge Enable Inverted', 
+'Parallel Combined Faults Present',         
+
+]
+
+
+BMS_Master = OrionView.BMSUn
