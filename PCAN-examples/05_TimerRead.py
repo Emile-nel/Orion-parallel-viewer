@@ -215,7 +215,7 @@ class TimerRead():
         stsResult = self.m_objPCANBasic.ReadFD(self.PcanHandle)
 
         if stsResult[0] == PCAN_ERROR_OK:
-            ## We show the received message
+            ## We show the received messages
             self.ProcessMessageCanFd(stsResult[1],stsResult[2])
             
         return stsResult[0]

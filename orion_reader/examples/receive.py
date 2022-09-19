@@ -14,10 +14,11 @@ from datetime import datetime
 
 import tkinter as tk
 import OrionView
+from PCANBasic import *
 
 ws = tk.Tk()
 
-
+IS_WINDOWS = platform.system() == 'Windows'
 
 
 
@@ -149,37 +150,60 @@ def clear_fault_codes(unitId):
     bus.send(msg)
     print('Device with OBDII ID, '+hex(unitId) + ', fault codes cleared ')
 
-def read_bus(bus_device):
+def read_bus():
     #Read data from 'bus_device' until the nect newline character
-    message = bus.recv(0.2)
-    while True:
-        if message:
-            break
+    if IS_WINDOWS:
+        stsResult = PCAN_ERROR_OK
+        while (not (stsResult & PCAN_ERROR_QRCVEMPTY)):
+            stsResult = m_objPCANBasic.Read(PcanHandle)
+            if stsResult[0] == PCAN_ERROR_OK:
+                message = stsResult[1]
+                itstimestamp = stsResult[2]
+                microsTimeStamp = itstimestamp.micros + 1000 * itstimestamp.millis + 0x100000000 * 1000 * itstimestamp.millis_overflow
+                messageData = []
+
+                strTemp = ""
+                for x in message.DATA:
+                    strTemp += '%.2X ' % x
+                    
+                messageStrings = strTemp.split()
+                messageData = [int(i) for i in messageStrings]
+                return(message.ID,message.LEN,messageData,microsTimeStamp)
+            if stsResult != PCAN_ERROR_OK and stsResult != PCAN_ERROR_QRCVEMPTY:
+                ShowStatus(stsResult)
+                return
+
+
+    else:
         message = bus.recv(0.2)
+        while True:
+            if message:
+                break
+            message = bus.recv(0.2)
+            
+
+        try:
+            # if message.arbitration_id == 947:    
+            #     print(list(message.data))
+
+            messageData = list(message.data)
+            messageString =  "{}:ID={}:LEN={}".format("RX", message.arbitration_id, message.dlc)
+            for x in range(message.dlc):
+                messageString += ":{:02x}".format(message.data[x])        
+        #print exception if failed to parse the CAN message into the string.
+        except Exception as e:
+            print(e)
         
-
-    try:
-        # if message.arbitration_id == 947:    
-        #     print(list(message.data))
-
-        messageData = list(message.data)
-        messageString =  "{}:ID={}:LEN={}".format("RX", message.arbitration_id, message.dlc)
-        for x in range(message.dlc):
-            messageString += ":{:02x}".format(message.data[x])        
-    #print exception if failed to parse the CAN message into the string.
-    except Exception as e:
-        print(e)
-    
-    date_time = datetime.fromtimestamp(message.timestamp)
-    #print(date_time)
-    return(message.arbitration_id,message.dlc,messageData,message.timestamp)
+        date_time = datetime.fromtimestamp(message.timestamp)
+        #print(date_time)
+        return(message.arbitration_id,message.dlc,messageData,message.timestamp)
 
 
-def bus_run_loop(bus_device):
+def bus_run_loop():
     #Background thread ofr serial reading
     try:
         while not stop_bus.is_set():
-            messageId,messageLen,messageData,messageTime = read_bus(bus_device)
+            messageId,messageLen,messageData,messageTime = read_bus()
             # print(messageString)
             #Sample Frame: FRAME:ID=246:LEN=8:8E:62:1C:F6:1E:63:63:20
             # Split it into an array (e.g. ['FRAME', 'ID=246', 'LEN=8', '8E', '62', '1C', 'F6', '1E', '63', '63', '20'])
@@ -211,8 +235,8 @@ def bus_run_loop(bus_device):
                 print(e)
                 
 
-    except:
-        print('the bus stopped.. Why did the bus stop? !!')
+    except Exception as e:
+            print(e)
 
 
 def populate_whitelist():  
@@ -223,7 +247,51 @@ def populate_whitelist():
             WHITELIST_IDs.append(message.id)
     print(WHITELIST_IDs)
     
+def CheckForLibrary():
+    """
+    Checks for availability of the PCANBasic library
+    """
+    ## Check for dll file
+    try:
+        m_objPCANBasic.Uninitialize(PCAN_NONEBUS)
+        return True
+    except :
+        print("Unable to find the library: PCANBasic.dll !")
+        print("Press any key to close")
+        #self.getch()
+        return False 
 
+
+def GetFormattedError(error):
+    """
+    Help Function used to get an error as text
+
+    Parameters:
+        error = Error code to be translated
+
+    Returns:
+        A text with the translated error
+    """
+    ## Gets the text using the GetErrorText API function. If the function success, the translated error is returned.
+    ## If it fails, a text describing the current error is returned.
+    stsReturn = m_objPCANBasic.GetErrorText(error,0x09)
+    if stsReturn[0] != PCAN_ERROR_OK:
+        return "An error occurred. Error-code's text ({0:X}h) couldn't be retrieved".format(error)
+    else:
+        message = str(stsReturn[1])
+        return message.replace("'","",2).replace("b","",1)
+
+
+def ShowStatus(status):
+    """
+    Shows formatted status
+
+    Parameters:
+        status = Will be formatted
+    """
+    print("=========================================================================================")
+    print(GetFormattedError(status))
+    print("=========================================================================================")
 #run if this is the main script being run
 if __name__ == '__main__':
 
@@ -232,15 +300,58 @@ if __name__ == '__main__':
     bus_device = None
     bus_thread = None
 
+
+
     try: 
-        os.system('sudo ip link set can0 type can bitrate 500000')
-        os.system('sudo ifconfig can0 up')
-        bus = can.interface.Bus(channel = 'can0', bustype = 'socketcan')# socketcan_native
+
+        if IS_WINDOWS: 
+            #Running on windows system using PCANUSB
+            # Defines
+            # Sets the PCANHandle (Hardware Channel)
+            PcanHandle = PCAN_USBBUS1
+            # Sets the desired connection mode (CAN = false / CAN-FD = true)
+            IsFD = False
+            # Sets the bitrate for normal CAN devices
+            Bitrate = PCAN_BAUD_500K
+
+            # Shows if DLL was found
+            m_DLLFound = False
+            try:
+                m_objPCANBasic = PCANBasic()        
+                m_DLLFound = CheckForLibrary()
+            except:
+                print("Unable to find the library: PCANBasic.dll !")
+                print("Press any key to close")
+                m_DLLFound = False
+
+            stsResult = m_objPCANBasic.Initialize(PcanHandle,Bitrate)
+
+            if stsResult != PCAN_ERROR_OK:
+                print("Can not initialize. Please check the defines in the code.")
+                ShowStatus(stsResult)
+                print("")
+                print("Press enter to close")
+                input()
+                
+                    ## Reading messages...
+            print("Successfully initialized.")
+            
+            bus_thread = threading.Thread(target=bus_run_loop, args=())
+            bus_thread.start()
+            
+            print("Started reading messages...")
+            print("")
+            print("Press any key to close")
+                
+        else: #else we are running on a raspberry pi
+            os.system('sudo ip link set can0 type can bitrate 500000')
+            os.system('sudo ifconfig can0 up')
+            bus = can.interface.Bus(channel = 'can0', bustype = 'socketcan')# socketcan_native
         #populate the whitelist ID list
         
-        # Start the bus reading in the background thread
-        bus_thread = threading.Thread(target=bus_run_loop, args=(bus,))
-        bus_thread.start()
+            # Start the bus reading in the background thread
+            bus_thread = threading.Thread(target=bus_run_loop, args=())
+            bus_thread.start()
 
         #make a test button
         

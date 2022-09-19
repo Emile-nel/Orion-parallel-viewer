@@ -120,7 +120,7 @@ class BMSUnit:
 
 
 class CombinedBMSUnit(BMSUnit):
-    def __init__(self,combinedDCL,combinedCCL,) -> None:
+    def __init__(self,) -> None:
         pass
 
 class CANMessage:
