@@ -3,6 +3,7 @@ from enum import Enum
 
 
 
+
 class BitOrder(Enum):
     LSB = 0
     MSB = 1
@@ -199,7 +200,7 @@ class CANMessage:
 
 class MessageManager():
 
-
+    cell_broadcast_ids = [0xe3,0xe4,0xe5,0xe6]
     id_list = [0x3b1,0x3b2,0x3b3]
     id_read =[]
     msg_list = []
@@ -286,6 +287,17 @@ class MessageManager():
                 self.cell_info[0xe3+u].append({'Broadcast_Cell_ID':i,'Broadcast_Cell_Intant_Voltage': 0.0, 'Broadcast_Cell_Resistance': 0.0,'Broadcast_Cell_Open_Voltage' : 0.0})
 
         
+    def process_message(self,messageId,messageData,messageTime):
+        if messageId in self.cell_broadcast_ids:
+            self.process_cell_broadcast(messageId,messageData)
+        elif messageId in self.WHITELIST_IDs:
+            for msg in self.CANMsgs_Master:
+                if messageId == msg.id:
+                    msg.set_val(messageData,messageTime)
+                    print(msg.id)
+                    print(msg.name)
+                    print(msg.value)
+
 
     def process_cell_broadcast(self,messageId,messageData):
     

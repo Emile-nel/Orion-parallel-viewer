@@ -236,7 +236,7 @@ class TimerRead():
         Parameters:
             msg = The received PCAN-Basic CAN message
             itstimestamp = Timestamp of the message as TPCANTimestamp structure
-        """
+       
         if msg.ID in self.MM.WHITELIST_IDs:
                 
             microsTimeStamp = itstimestamp.micros + 1000 * itstimestamp.millis + 0x100000000 * 1000 * itstimestamp.millis_overflow
@@ -251,7 +251,10 @@ class TimerRead():
             print(msg.ID)
             print(microsTimeStamp)
             print('not sure what else you want')
+         """
+        microsTimeStamp = itstimestamp.micros + 1000 * itstimestamp.millis + 0x100000000 * 1000 * itstimestamp.millis_overflow
         
+        self.MM.process_message(msg.ID,self.GetDataInt(msg.DATA,msg.MSGTYPE),microsTimeStamp)
     
 
 
