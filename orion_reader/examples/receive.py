@@ -13,7 +13,7 @@ import traceback
 from datetime import datetime
 
 import tkinter as tk
-import OrionView
+from OrionView import *
 from PCANBasic import *
 
 ws = tk.Tk()
@@ -55,43 +55,43 @@ CANMsgs_Master = [
 # CANMessage('Broadcast_Cell_Resistance',     0xe3,24,16,BitOrder.MSB,ByteOrder.BigEndian,0.01),  #Units in mOhm 
 # CANMessage('Broadcast_Cell_Open_Voltage',   0xe3,40,16,BitOrder.MSB,ByteOrder.BigEndian,0.1),   #Units in mV
     #0x3b1
-OrionView.CANMessage('Pack_Current',                              0x3b1,0,16,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,0.1),
-OrionView.CANMessage('Inst_Voltage',                              0x3b1,16,16,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,0.1),
-OrionView.CANMessage('Pack_SOC',                                  0x3b1,32,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,0.5),
-OrionView.CANMessage('Relay_State',                               0x3b1,40,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('Pack_DCL',                                  0x3b2,0,16,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('Pack_CCL',                                  0x3b2,16,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('High_Temperature',                          0x3b2,32,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('Low_Temperature',                           0x3b2,40,8,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC P0A1F : Internal Cell Communication',   0x3b3,0,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
-OrionView.CANMessage('DTC P0A12 : Cell Balancing Stuck Off',      0x3b3,1,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC P0A80 : Weak Cell',                     0x3b3,2,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC P0AFA : Low Cell Voltage',              0x3b3,3,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC P0A04 : Cell Open Wiring',              0x3b3,4,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC P0AC0 : Current Sensor',                0x3b3,5,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC P0A0D : Cell Voltage Over 5V',          0x3b3,6,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC P0A0F : Cell Bank',                     0x3b3,7,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC P0A02 : Weak Pack',                     0x3b3,8,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC P0A81 : Fan Monitor',                   0x3b3,9,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC P0A9C : Thermistor',                    0x3b3,10,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC U0100 : CAN Communication',             0x3b3,11,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC P0560 : Redundant Power Supply',        0x3b3,12,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC P0AA6 : High Voltage Isolation',        0x3b3,13,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('DTC P0A05 : Invalid Input Supply Voltage',  0x3b3,14,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),  
-OrionView.CANMessage('DTC P0A06 : ChargeEnable Relay',            0x3b3,15,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
-OrionView.CANMessage('DTC P0A07 : DischargeEnable Relay',         0x3b3,16,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
-OrionView.CANMessage('DTC P0A08 : Charger Safety Relay',          0x3b3,17,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
-OrionView.CANMessage('DTC P0A09 : Internal Hardware',             0x3b3,18,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
-OrionView.CANMessage('DTC P0A0A : Internal Heatsink Thermistor',  0x3b3,19,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
-OrionView.CANMessage('DTC P0A0B : Internal Logic',                0x3b3,20,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
-OrionView.CANMessage('DTC P0A0C : Highest Cell Voltage Too High', 0x3b3,21,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
-OrionView.CANMessage('DTC P0A0E : Lowest Cell Voltage Too Low',   0x3b3,22,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
-OrionView.CANMessage('DTC P0A10 : Pack Too Hot',                  0x3b3,23,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
-OrionView.CANMessage('Balancing_Active',                          0x3b3,24,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
-OrionView.CANMessage('MultiPurpose_Enable',                       0x3b3,25,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
-OrionView.CANMessage('Charge Enable Inverted',                    0x3b3,26,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1),
-OrionView.CANMessage('Parallel Combined Charge Enable Inverted',  0x3b3,30,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
-OrionView.CANMessage('Parallel Combined Faults Present',          0x3b3,31,1,OrionView.BitOrder.MSB,OrionView.ByteOrder.BigEndian,1), 
+CANMessage('Pack_Current',                              0x3b1,0,16,BitOrder.MSB,ByteOrder.BigEndian,0.1),
+CANMessage('Inst_Voltage',                              0x3b1,16,16,BitOrder.MSB,ByteOrder.BigEndian,0.1),
+CANMessage('Pack_SOC',                                  0x3b1,32,8,BitOrder.MSB,ByteOrder.BigEndian,0.5),
+CANMessage('Relay_State',                               0x3b1,40,8,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('Pack_DCL',                                  0x3b2,0,16,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('Pack_CCL',                                  0x3b2,16,8,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('High_Temperature',                          0x3b2,32,8,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('Low_Temperature',                           0x3b2,40,8,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC P0A1F : Internal Cell Communication',   0x3b3,0,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+CANMessage('DTC P0A12 : Cell Balancing Stuck Off',      0x3b3,1,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC P0A80 : Weak Cell',                     0x3b3,2,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC P0AFA : Low Cell Voltage',              0x3b3,3,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC P0A04 : Cell Open Wiring',              0x3b3,4,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC P0AC0 : Current Sensor',                0x3b3,5,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC P0A0D : Cell Voltage Over 5V',          0x3b3,6,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC P0A0F : Cell Bank',                     0x3b3,7,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC P0A02 : Weak Pack',                     0x3b3,8,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC P0A81 : Fan Monitor',                   0x3b3,9,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC P0A9C : Thermistor',                    0x3b3,10,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC U0100 : CAN Communication',             0x3b3,11,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC P0560 : Redundant Power Supply',        0x3b3,12,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC P0AA6 : High Voltage Isolation',        0x3b3,13,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('DTC P0A05 : Invalid Input Supply Voltage',  0x3b3,14,1,BitOrder.MSB,ByteOrder.BigEndian,1),  
+CANMessage('DTC P0A06 : ChargeEnable Relay',            0x3b3,15,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+CANMessage('DTC P0A07 : DischargeEnable Relay',         0x3b3,16,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+CANMessage('DTC P0A08 : Charger Safety Relay',          0x3b3,17,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+CANMessage('DTC P0A09 : Internal Hardware',             0x3b3,18,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+CANMessage('DTC P0A0A : Internal Heatsink Thermistor',  0x3b3,19,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+CANMessage('DTC P0A0B : Internal Logic',                0x3b3,20,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+CANMessage('DTC P0A0C : Highest Cell Voltage Too High', 0x3b3,21,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+CANMessage('DTC P0A0E : Lowest Cell Voltage Too Low',   0x3b3,22,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+CANMessage('DTC P0A10 : Pack Too Hot',                  0x3b3,23,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+CANMessage('Balancing_Active',                          0x3b3,24,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+CANMessage('MultiPurpose_Enable',                       0x3b3,25,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+CANMessage('Charge Enable Inverted',                    0x3b3,26,1,BitOrder.MSB,ByteOrder.BigEndian,1),
+CANMessage('Parallel Combined Charge Enable Inverted',  0x3b3,30,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
+CANMessage('Parallel Combined Faults Present',          0x3b3,31,1,BitOrder.MSB,ByteOrder.BigEndian,1), 
 #parallel bus voltage
 #parallel current
 #parallel charge anable
@@ -105,10 +105,10 @@ OrionView.CANMessage('Parallel Combined Faults Present',          0x3b3,31,1,Ori
 ]
 
 
-BMS_Master = OrionView.BMSUnit()
-BMS_Slave1 = OrionView.BMSUnit()
-BMS_Slave2 = OrionView.BMSUnit()
-BMS_Slave3 = OrionView.BMSUnit()
+BMS_Master = BMSUnit()
+BMS_Slave1 = BMSUnit()
+BMS_Slave2 = BMSUnit()
+BMS_Slave3 = BMSUnit()
 
 def process_cell_broadcast(messageId,messageData):
     
@@ -156,6 +156,7 @@ def read_bus():
         stsResult = PCAN_ERROR_OK
         while (not (stsResult & PCAN_ERROR_QRCVEMPTY)):
             stsResult = m_objPCANBasic.Read(PcanHandle)
+            steResultStatus = stsResult[0]
             if stsResult[0] == PCAN_ERROR_OK:
                 message = stsResult[1]
                 itstimestamp = stsResult[2]
@@ -167,14 +168,13 @@ def read_bus():
                     strTemp += '%.2X ' % x
                     
                 messageStrings = strTemp.split()
-                messageData = [int(i) for i in messageStrings]
+                messageData = [int(i,0) for i in messageStrings]
                 return(message.ID,message.LEN,messageData,microsTimeStamp)
-            if stsResult != PCAN_ERROR_OK and stsResult != PCAN_ERROR_QRCVEMPTY:
-                ShowStatus(stsResult)
+            
+            if steResultStatus != PCAN_ERROR_OK and steResultStatus != PCAN_ERROR_QRCVEMPTY:
+                ShowStatus(steResultStatus)
                 return
-
-
-    else:
+    else: #if on Raspberry pi
         message = bus.recv(0.2)
         while True:
             if message:
@@ -301,49 +301,47 @@ if __name__ == '__main__':
     bus_thread = None
 
 
-
-    try: 
-
-        if IS_WINDOWS: 
-            #Running on windows system using PCANUSB
-            # Defines
-            # Sets the PCANHandle (Hardware Channel)
-            PcanHandle = PCAN_USBBUS1
-            # Sets the desired connection mode (CAN = false / CAN-FD = true)
-            IsFD = False
-            # Sets the bitrate for normal CAN devices
-            Bitrate = PCAN_BAUD_500K
-
-            # Shows if DLL was found
+    if IS_WINDOWS: 
+        #Running on windows system using PCANUSB
+        # Defines
+        # Sets the PCANHandle (Hardware Channel)
+        PcanHandle = PCAN_USBBUS1
+        # Sets the desired connection mode (CAN = false / CAN-FD = true)
+        IsFD = False
+        # Sets the bitrate for normal CAN devices
+        Bitrate = PCAN_BAUD_500K
+        # Shows if DLL was found
+        m_DLLFound = False
+        try:
+            m_objPCANBasic = PCANBasic()        
+            m_DLLFound = CheckForLibrary()
+        except:
+            print("Unable to find the library: PCANBasic.dll !")
+            print("Press any key to close")
             m_DLLFound = False
-            try:
-                m_objPCANBasic = PCANBasic()        
-                m_DLLFound = CheckForLibrary()
-            except:
-                print("Unable to find the library: PCANBasic.dll !")
-                print("Press any key to close")
-                m_DLLFound = False
+        finally:
+            if m_DLLFound:
+                m_objPCANBasic.Uninitialize(PCAN_NONEBUS)    
+        #CANFD not used in this application
+        stsResult = m_objPCANBasic.Initialize(PcanHandle,Bitrate)
 
-            stsResult = m_objPCANBasic.Initialize(PcanHandle,Bitrate)
-
-            if stsResult != PCAN_ERROR_OK:
-                print("Can not initialize. Please check the defines in the code.")
-                ShowStatus(stsResult)
-                print("")
-                print("Press enter to close")
-                input()
-                
-                    ## Reading messages...
+        if stsResult != PCAN_ERROR_OK:
+            print("Can not initialize. Please check the defines in the code.")
+            ShowStatus(stsResult)
+            print("")
+            print("Press enter to close")
+            input()
+        else:
+            ## Reading messages...
             print("Successfully initialized.")
-            
             bus_thread = threading.Thread(target=bus_run_loop, args=())
             bus_thread.start()
-            
             print("Started reading messages...")
             print("")
             print("Press any key to close")
-                
-        else: #else we are running on a raspberry pi
+            
+    else: #else we are running on a raspberry pi
+        try:
             os.system('sudo ip link set can0 type can bitrate 500000')
             os.system('sudo ifconfig can0 up')
             bus = can.interface.Bus(channel = 'can0', bustype = 'socketcan')# socketcan_native
@@ -353,37 +351,37 @@ if __name__ == '__main__':
             bus_thread = threading.Thread(target=bus_run_loop, args=())
             bus_thread.start()
 
-        #make a test button
-        
-        
-        ws.title('Orion Reader')
-        ws.geometry('760x544')
-        Btest = tk.Button(ws,text="Send OBD",command = lambda : clear_fault_codes(0x7df))
-        Btest.pack()
-        # Start the main loop
-        ws.mainloop()
-      
+    #make a test button
+    
+    
+            ws.title('Orion Reader')
+            ws.geometry('760x544')
+            Btest = tk.Button(ws,text="Send OBD",command = lambda : clear_fault_codes(0x7df))
+            Btest.pack()
+            # Start the main loop
+            ws.mainloop()
+    
 
-    except:
-        print('Sorry, the bus could not be started')
-    finally:
-        if bus_thread:
+        except:
+            print('Sorry, the bus could not be started')
+        finally:
+            if bus_thread:
 
-            stop_bus.set()
-            bus_thread.join()
+                stop_bus.set()
+                bus_thread.join()
 
-            #end the socketCan session
-            os.system('sudo ifconfig can0 down')
+                #end the socketCan session
+                os.system('sudo ifconfig can0 down')
 
-            #destroy the tkinter mainloop
-           # ws.destroy()
+                #destroy the tkinter mainloop
+            # ws.destroy()
 
-            #print the exception if the thread returned one
-            if thread_exception:
-                traceback.print_exception(*thread_exception)
-                sys.stderr.flush()
-            else:
-                print('The bus is being stopped safely')
+                #print the exception if the thread returned one
+                if thread_exception:
+                    traceback.print_exception(*thread_exception)
+                    sys.stderr.flush()
+                else:
+                    print('The bus is being stopped safely')
 
 
 
