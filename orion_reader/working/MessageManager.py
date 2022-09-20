@@ -436,23 +436,23 @@ class MessageManager():
         cellOpenVoltage = int.from_bytes(ValueBytes,"big")*0.1
         #Append cell info list for master unit
         if messageId == 0xe3:
-            self.BMS_Master.cell_info[cellId - 1]['Broadcast_Cell_ID'] = cellId
-            self.BMS_Master.cell_info[cellId - 1]['Broadcast_Cell_Intant_Voltage'] = cellInstVoltage
-            self.BMS_Master.cell_info[cellId - 1]['Broadcast_Cell_Resistance'] = cellResistance
-            self.BMS_Master.cell_info[cellId - 1]['Broadcast_Cell_Open_Voltage'] = cellOpenVoltage
+            self.BMS_Master.cell_info[cellId - 1]['Broadcast_Cell_ID']              = cellId
+            self.BMS_Master.cell_info[cellId - 1]['Broadcast_Cell_Intant_Voltage']  = cellInstVoltage
+            self.BMS_Master.cell_info[cellId - 1]['Broadcast_Cell_Resistance']      = cellResistance
+            self.BMS_Master.cell_info[cellId - 1]['Broadcast_Cell_Open_Voltage']    = cellOpenVoltage
         elif messageId == 0xe4:
-            self.BMS_Slave1.cell_info[cellId - 1]['Broadcast_Cell_ID'] = cellId
-            self.BMS_Slave1.cell_info[cellId - 1]['Broadcast_Cell_Intant_Voltage'] = cellInstVoltage
-            self.BMS_Slave1.cell_info[cellId - 1]['Broadcast_Cell_Resistance'] = cellResistance
-            self.BMS_Slave1.cell_info[cellId - 1]['Broadcast_Cell_Open_Voltage'] = cellOpenVoltage
+            self.BMS_Slave1.cell_info[cellId - 1]['Broadcast_Cell_ID']              = cellId
+            self.BMS_Slave1.cell_info[cellId - 1]['Broadcast_Cell_Intant_Voltage']  = cellInstVoltage
+            self.BMS_Slave1.cell_info[cellId - 1]['Broadcast_Cell_Resistance']      = cellResistance
+            self.BMS_Slave1.cell_info[cellId - 1]['Broadcast_Cell_Open_Voltage']    = cellOpenVoltage
         elif messageId == 0xe5:
-            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_ID'] = cellId
-            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_Intant_Voltage'] = cellInstVoltage
-            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_Resistance'] = cellResistance
-            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_Open_Voltage'] = cellOpenVoltage
+            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_ID']              = cellId
+            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_Intant_Voltage']  = cellInstVoltage
+            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_Resistance']      = cellResistance
+            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_Open_Voltage']    = cellOpenVoltage
         elif messageId == 0xe6:
-            self.BMS_Slave3.cell_info[cellId - 1]['Broadcast_Cell_ID'] = cellId
-            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_Intant_Voltage'] = cellInstVoltage
-            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_Resistance'] = cellResistance
-            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_Open_Voltage'] = cellOpenVoltage
+            self.BMS_Slave3.cell_info[cellId - 1]['Broadcast_Cell_ID']              = cellId
+            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_Intant_Voltage']  = cellInstVoltage
+            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_Resistance']      = cellResistance
+            self.BMS_Slave2.cell_info[cellId - 1]['Broadcast_Cell_Open_Voltage']    = cellOpenVoltage
 
