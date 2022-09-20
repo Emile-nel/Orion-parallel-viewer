@@ -7,6 +7,7 @@ import os
 from MessageManager import *
 
 
+
 IS_WINDOWS = platform.system() == 'Windows'
 GETCH_SUPPORTED = True
 if IS_WINDOWS: 
