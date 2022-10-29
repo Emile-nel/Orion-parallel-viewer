@@ -18,7 +18,7 @@ class BMSUnit:
     cell_info = []
 
     for i in range(1,45,1):
-                self.cell_info[0xe3+u].append({'Broadcast_Cell_ID':i,'Broadcast_Cell_Intant_Voltage': 0.0, 'Broadcast_Cell_Resistance': 0.0,'Broadcast_Cell_Open_Voltage' : 0.0})
+                cell_info.append({'Broadcast_Cell_ID':i,'Broadcast_Cell_Intant_Voltage': 0.0, 'Broadcast_Cell_Resistance': 0.0,'Broadcast_Cell_Open_Voltage' : 0.0})
 
     def __init__(self,
     
@@ -413,9 +413,9 @@ class MessageManager():
             for msg in self.CANMsgs_Master:
                 if messageId == msg.id:
                     msg.set_val(messageData,messageTime)
-                    print(msg.id)
-                    print(msg.name)
-                    print(msg.value)
+                    #print(msg.id)
+                    #print(msg.name)
+                    #print(msg.value)
 
 
     def process_cell_broadcast(self,messageId,messageData):

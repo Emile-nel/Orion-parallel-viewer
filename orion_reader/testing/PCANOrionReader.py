@@ -1,4 +1,5 @@
 ## Needed Imports
+from inspect import isroutine
 from PCANBasic import *
 import string  
 import time
@@ -119,6 +120,8 @@ class TimerRead():
 
     MM = MessageManager()
 
+
+
     def __init__(self):
         """
         Create an object starts the programm
@@ -157,12 +160,13 @@ class TimerRead():
         
         
         self.m_objTimer = TimerRepeater("ReadMessages",(self.TimerInterval/1000), self.ReadMessages)
-        self.m_objTimer.start()
-        print("Started reading messages...")
-        print("")
-        print("Press any key to close")
-        self.getch()
-        self.m_objTimer.stop()
+        #self.m_objTimer.start()
+        #print("Started reading messages...")
+        #print("")
+        #print("Press any key to close")
+        #self.getch()
+        #self.m_objTimer.stop()
+
 
     def __del__(self):
         if self.m_DLLFound:

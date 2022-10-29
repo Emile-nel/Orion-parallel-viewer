@@ -1,0 +1,36 @@
+.main-body {
+    width : 960px;
+    /* height: 544; */
+    background-color: rgb(35,43,58);
+    /* padding: 30px; */
+    text-align: center;
+
+}
+body {
+    background-color:  white;
+    color: white;
+    /* width: 960px; */
+}
+p {
+    color: white;
+}
+
+.battery-tile {
+
+    width : 800px;
+    height: 80px;
+    background-color: rgb(18,26,39);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 25px;
+
+}
+
+.tile-image {
+    height: 50px;
+    width: 50px;
+    margin: 0;
+    position: relative;
+   
+
+}

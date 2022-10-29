@@ -119,7 +119,7 @@ class TimerRead():
     #endregion
 
     MM = MessageManager()
-
+    isRunning = False
     def __init__(self):
         """
         Create an object starts the programm
@@ -158,13 +158,20 @@ class TimerRead():
         
         
         self.m_objTimer = TimerRepeater("ReadMessages",(self.TimerInterval/1000), self.ReadMessages)
+        #self.m_objTimer.start()
+    #     print("Started reading messages...")
+    #     print("")
+    #     print("Press any key to close")
+    #     self.getch()
+    #     self.m_objTimer.stop()
+    def start_reading(self):
         self.m_objTimer.start()
-        print("Started reading messages...")
-        print("")
-        print("Press any key to close")
-        self.getch()
+        self.isRunning = True
+    def stop_reading(self):
         self.m_objTimer.stop()
-
+        self.isRunning = False
+    def get_running_state(self):
+        return self.isRunning
     def __del__(self):
         if self.m_DLLFound:
             self.m_objPCANBasic.Uninitialize(PCAN_NONEBUS)
