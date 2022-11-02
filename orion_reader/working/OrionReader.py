@@ -168,7 +168,6 @@ def update_state(n_clicks):
 
 #run if this is the main script being run
 if __name__ == '__main__':
-    app.run_server(debug=False)
     if IS_WINDOWS:
         ## Starts the program
         #TimerRead()
@@ -179,6 +178,4 @@ if __name__ == '__main__':
         #Run Raspberry pi setup with socketCAN
         print("gogo raspberry")
     # have some sort of indicatio that the background tasks are indeed running
-
-
-
+    app.run_server(debug=False)
