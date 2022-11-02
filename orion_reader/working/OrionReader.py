@@ -65,7 +65,7 @@ def create_battery_card(batteryName,voltage,current,power,soc,isFault,batteryId)
             ],className="battery-tile align-items-center text-start ",
         )
     ], className="justify-content-center"
-),id=batteryId,n_clicks=0)
+),id=batteryId,n_clicks=0,style={"width":"85%","max-width":"800px","min-width":"700px"})
 
 
 app.layout = html.Div([
