@@ -66,6 +66,7 @@ class BMSUnit:
     lowTemp         = 0,
     heatSinkTemp    = 0,
     lastOnline      = None,
+    isOnline         = False,
        ) -> None:
         self.unitType           = unitType          ,
         self.instantVoltage     = instantVoltage    ,
@@ -86,6 +87,7 @@ class BMSUnit:
         self.lowTemp            = lowTemp           ,
         self.heatSinkTemp       = heatSinkTemp      ,
         self.lastOnline         = lastOnline        ,
+        self.isOnline           = isOnline          ,
 
         for i in range(1,45,1):
             self.cell_info.append({'Broadcast_Cell_ID':i,'Broadcast_Cell_Intant_Voltage': 0.0, 'Broadcast_Cell_Resistance': 0.0,'Broadcast_Cell_Open_Voltage' : 0.0}),

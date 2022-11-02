@@ -24,40 +24,65 @@ IS_WINDOWS = platform.system() == 'Windows'
 
 cell_id = 0
 
-battery_card = dbc.Container(
-    [
-        html.Div(
+def create_battery_card(batteryName,voltage,current,power,soc,isFault,batteryId):
+    if power < 1000 :
+        power_string = '{power:.1f} W'.format(power=power)
+    else:
+        power_string = '{power:.1f} kw'.format(power=power/1000)
 
-        ),
+    if -1 < current < 1:#in idle
+        soc_string = '{soc} idle'.format(soc=soc)
+    if current >= 1: #Charging
+        soc_string = '{soc} charging'.format(soc=soc)
+    if current <= -1: # Discharging
+        soc_string = '{soc} discharging'.format(soc=soc)
+
+
+    return html.Div(dbc.Container( 
+    [
         dbc.Row(
             
             [
                 dbc.Col(className="col-md-2 ",
                 children=[html.Img(src="/assets/images/batery_icon.png")]),
-                dbc.Col(className="col-md-10",
+                dbc.Col(className="col-md-8",
                 children=[
-                    html.Div("Orion BMS - Master"),
+                    html.Div('{name}'.format(name=batteryName)),
                     dbc.Row(
                         children=[
-                        dbc.Col(className="col-md-3",children=[html.Div("146.5 V")]),
-                        dbc.Col(className="col-md-3",children=[html.Div("56 A")]),
-                        dbc.Col(className="col-md-3",children=[html.Div("15.4 kw")]),]
+                        dbc.Col(className="col-md-3",children=[html.Div("{voltage:.2f} V".format(voltage=voltage))]),
+                        dbc.Col(className="col-md-3",children=[html.Div("{current:.2f} A".format(current=current))]),
+                        dbc.Col(className="col-md-3",children=[html.Div("{sPower}".format(sPower=power_string))]),
+                        dbc.Col(className="col-md-3",children=[html.Div('{sSoc}'.format(sSoc=soc_string))]),]
                     )
                 ]),
-
-            ],className="battery-tile align-items-center text-start "
+                dbc.Col(className="col-md-2 battery-status  d-flex flex-column justify-content-center",
+                    children=[
+                        
+                                html.H6("Status", className="p-2", style={ "height":"50%"}),
+                                html.H5("FAULT", className="p-2", style={ "height":"50%", "color" : "red"})                        
+                            ]),
+            ],className="battery-tile align-items-center text-start ",
         )
     ], className="justify-content-center"
-)
+),id=batteryId,n_clicks=0)
+
 
 app.layout = html.Div([
     #main div
     html.Div(
+        
         className="main-body",
         children=[
-            battery_card,
-            battery_card,
-            battery_card,
+            html.H5("Summer Breez Battery Monitor"),
+            create_battery_card('Orion Master Combined',156.22432,50.2,500,53,False,'master_combined'),
+            create_battery_card('Orion Master',156.22432,50.2,500,53,False,'master'),
+            create_battery_card('Orion Slave1',156.22432,0.12,5000,53,False,'slave1'),
+            create_battery_card('Orion Slave2',156.22432,-50.2,500,53,False,'slave2'),
+            html.Div(id="masterCombinedSelected",children="",),
+            html.Div(id="masterSelected",children="",),
+            html.Div(id="slave1Selected",children="",),
+            html.Div(id="slave2Selected",children="",),
 
     ],
     ),
@@ -67,7 +92,7 @@ app.layout = html.Div([
     html.Div(id='live-update-text'),
     dcc.Interval(
         id = 'interval-component',
-        interval=1*1000, # in milliseconds
+        interval=3*1000, # in milliseconds
         n_intervals=0
     )
 
@@ -95,13 +120,35 @@ def update_metrics(n):
     #     return msg_list
     # else:
     #     return html.Span('The bus is not running anymore bru:',style=style)
-      
 
 @app.callback(
-    Output("state_ind","children"),
-    Input("ss","n_clicks"),
-    
+    Output("masterCombinedSelected","children"),
+    Input("master_combined","n_clicks"),
 )
+def update_state(n_clicks):
+    return "Master-Combined selected {n} times".format(n=n_clicks)
+
+@app.callback(
+    Output("masterSelected","children"),
+    Input("master","n_clicks"),
+)
+def update_state(n_clicks):
+    return "Master selected {n} times".format(n=n_clicks)
+
+@app.callback(
+    Output("slave1Selected","children"),
+    Input("slave1","n_clicks"),
+)
+def update_state(n_clicks):
+    return "Slave 1 selected {n} times".format(n=n_clicks)
+
+@app.callback(
+    Output("slave2Selected","children"),
+    Input("slave2","n_clicks"),
+)
+def update_state(n_clicks):
+    return "Slave 2 selected {n} times".format(n=n_clicks)
+
 def update_state(n_clicks):
     return "testing phase"
     # if (n_clicks%2) != 0:
