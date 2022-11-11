@@ -13,7 +13,7 @@ GETCH_SUPPORTED = True
 if IS_WINDOWS: 
     from msvcrt import getch
 else:
-    try:
+    try: 
         import getch	# pip install getch
     except ImportError:     
         GETCH_SUPPORTED = False
@@ -120,6 +120,7 @@ class TimerRead():
 
     MM = MessageManager()
     isRunning = False
+    
     def __init__(self):
         """
         Create an object starts the programm

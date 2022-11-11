@@ -1,0 +1,29 @@
+DateTime,Log Description,Action
+2022-11-11 13:57:29,DTC P0A80 : Weak Cell,Raised
+2022-11-11 13:57:29,DTC P0A04 : Cell Open Wiring,Raised
+2022-11-11 13:57:29,DTC P0AA6 : High Voltage Isolation,Raised
+2022-11-11 13:57:29,Master BMS Communication failure,Cleared
+2022-11-11 13:57:41,Master BMS Communication failure,Raised
+2022-11-11 13:57:50,DTC P0A80 : Weak Cell,Cleared
+2022-11-11 13:57:50,DTC P0A04 : Cell Open Wiring,Cleared
+2022-11-11 13:57:50,DTC P0A04 : Cell Open Wiring,Raised
+2022-11-11 13:57:50,Master BMS Communication failure,Cleared
+2022-11-11 13:57:50,DTC P0A80 : Weak Cell,Raised
+2022-11-11 14:00:56,DTC P0A80 : Weak Cell,Raised
+2022-11-11 14:00:56,DTC P0A04 : Cell Open Wiring,Raised
+2022-11-11 14:00:56,DTC P0AA6 : High Voltage Isolation,Raised
+2022-11-11 14:00:56,Master BMS Communication failure,Cleared
+2022-11-11 14:01:06,Master BMS Communication failure,Raised
+2022-11-11 14:01:11,Master BMS Communication failure,Cleared
+2022-11-11 14:03:23,DTC P0A80 : Weak Cell,Raised
+2022-11-11 14:03:23,DTC P0A04 : Cell Open Wiring,Raised
+2022-11-11 14:03:23,DTC P0AA6 : High Voltage Isolation,Raised
+2022-11-11 14:03:23,Master BMS Communication failure,Cleared
+2022-11-11 14:09:41,DTC P0A80 : Weak Cell,Raised
+2022-11-11 14:09:41,DTC P0A04 : Cell Open Wiring,Raised
+2022-11-11 14:09:41,DTC P0AA6 : High Voltage Isolation,Raised
+2022-11-11 14:09:41,Master BMS Communication failure,Cleared
+2022-11-11 14:10:53,DTC P0A80 : Weak Cell,Raised
+2022-11-11 14:10:53,DTC P0A04 : Cell Open Wiring,Raised
+2022-11-11 14:10:53,DTC P0AA6 : High Voltage Isolation,Raised
+2022-11-11 14:10:53,Master BMS Communication failure,Cleared

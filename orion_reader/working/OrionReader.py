@@ -13,29 +13,46 @@ from dash import dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
+import time
+from CANManager import ManageCan
+from datetime import datetime
 
 OrionPCAN = None
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
-
+CM = ManageCan()
 IS_WINDOWS = platform.system() == 'Windows'
-# if IS_WINDOWS:
-#     OrionPCAN = TimerRead()
+
+global connectAttempt
+connectAttempt = 1
+connectString = "Still trying to connect. Make sure the device is connected"
+
 #OrionPCAN.GetDataInt
 
 cell_id = 0
 
-def create_battery_card(batteryName,voltage,current,power,soc,isFault,batteryId):
+def create_battery_card(batteryName,voltage,current,power,soc,isFault,batteryId,isConnected):
     if power < 1000 :
         power_string = '{power:.1f} W'.format(power=power)
     else:
         power_string = '{power:.1f} kw'.format(power=power/1000)
 
     if -1 < current < 1:#in idle
-        soc_string = '{soc} idle'.format(soc=soc)
+        soc_string = '{soc} % idle'.format(soc=soc)
     if current >= 1: #Charging
-        soc_string = '{soc} charging'.format(soc=soc)
+        soc_string = '{soc} % charging'.format(soc=soc)
     if current <= -1: # Discharging
-        soc_string = '{soc} discharging'.format(soc=soc)
+        soc_string = '{soc} % discharging'.format(soc=soc)
+    if isConnected:
+        if isFault:
+            statusString = "FAULT"
+            statusStyle = { "height":"50%", "color" : "red"}
+        else:
+            statusString = "OK"
+            statusStyle = { "height":"50%", "color" : "green"}
+    else:
+        statusString = "CONN.\nERROR"
+        statusStyle = { "height":"50%", "color" : "red"}     
+    
 
 
     return html.Div(dbc.Container( 
@@ -60,7 +77,7 @@ def create_battery_card(batteryName,voltage,current,power,soc,isFault,batteryId)
                     children=[
                         
                                 html.H6("Status", className="p-2", style={ "height":"50%"}),
-                                html.H5("FAULT", className="p-2", style={ "height":"50%", "color" : "red"})                        
+                                html.H5(statusString, className="p-2", style=statusStyle)                        
                             ]),
             ],className="battery-tile align-items-center text-start ",
         )
@@ -70,77 +87,115 @@ def create_battery_card(batteryName,voltage,current,power,soc,isFault,batteryId)
 
 app.layout = html.Div([
     #main div
-    html.Div(
-        
-        className="main-body",
+    html.Div(       
+        className="main-body-temp",
         children=[
-            html.H5("Summer Breez Battery Monitor"),
-            create_battery_card('Orion Master Combined',156.22432,50.2,500,53,False,'master_combined'),
-            create_battery_card('Orion Master',156.22432,50.2,500,53,False,'master'),
-            create_battery_card('Orion Slave1',156.22432,0.12,5000,53,False,'slave1'),
-            create_battery_card('Orion Slave2',156.22432,-50.2,500,53,False,'slave2'),
+            html.Div(id = "connecting_screen"),
+            html.Div(id = "battery_cards", children= [html.H5("Summer Breez Battery Monitor"),
+            create_battery_card('Orion Master Combined',156.22432,50.2,500,53,False,'master_combined',True),
+            create_battery_card('Orion Master',156.22432,50.2,500,53,False,'master',True),
+            create_battery_card('Orion Slave1',156.22432,0.12,5000,53,False,'slave1',False),
+            create_battery_card('Orion Slave2',156.22432,-50.2,500,53,False,'slave2',True),
             html.Div(id="masterCombinedSelected",children="",),
             html.Div(id="masterSelected",children="",),
             html.Div(id="slave1Selected",children="",),
-            html.Div(id="slave2Selected",children="",),
+            #html.Div(id="slave2Selected",children="",),
+            ]),
+            
 
-    ],
+    ],style={"display":"none"}
     ),
-    html.H6("This is just a Teeeessstt"),
-    html.Button('Start/Stop',id="ss",n_clicks=0),
-    html.Div(id="state_ind", children="should be stopped"),
-    html.Div(id='live-update-text'),
+    html.Div(   
+        id = 'main_display', 
+        className="main-body",
+    ),
     dcc.Interval(
         id = 'interval-component',
         interval=3*1000, # in milliseconds
-        n_intervals=0
-    )
+        #n_intervals=0
+    ),
+    html.Div(id="slave2Selected",children="afasfasdfadf",style={"background-color": "rgb(35,43,58)"}),
+
 
 ])
 
-@app.callback(Output('live-update-text', 'children'),
+@app.callback(Output('main_display', 'children'),
               Input('interval-component', 'n_intervals'))
-def update_metrics(n):
+def render_main(n):
+    #Check if CANBus device is initialized and connected
+    if CM.isConnected:
+        #Check if the CANbus is being read periodically. 
+        if CM.isRunning:
+            
+            onlineStatus = CM.MM.BMS_Master.isOnline
+            print(CM.MM.BMS_Master.activeFaults)
 
-    return "testing phase"
-    
-    # msg_list = []
-    # for msg in OrionPCAN.MM.CANMsgs_Master:
-    #     msg_list.append(html.Div([
-    #         html.Span("%s  with ID : %d has a value of : "%(msg.name,msg.id)),
-    #         html.Span(msg.timeStamp)
-    #         ]))
+            
+            #print(datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S'))
+            
+            
+            return [
+                create_battery_card('Orion Master Combined',CM.MM.BMS_Master_Combined.instantVoltage,
+                CM.MM.BMS_Master_Combined.packCurrent,CM.MM.BMS_Master_Combined.packCurrent*CM.MM.BMS_Master_Combined.instantVoltage,
+                CM.MM.BMS_Master_Combined.packSOC,CM.MM.BMS_Master_Combined.isFault,'master_combined',CM.MM.BMS_Master_Combined.isOnline),               
+                create_battery_card('Orion Master BMS',CM.MM.BMS_Master.instantVoltage,
+                CM.MM.BMS_Master.packCurrent,CM.MM.BMS_Master.packCurrent*CM.MM.BMS_Master.instantVoltage,
+                CM.MM.BMS_Master.packSOC,CM.MM.BMS_Master.isFault,'master',CM.MM.BMS_Master.isOnline),
+                create_battery_card('Orion Slave1 BMS',CM.MM.BMS_Slave1.instantVoltage,
+                CM.MM.BMS_Slave1.packCurrent,CM.MM.BMS_Slave1.packCurrent*CM.MM.BMS_Slave1.instantVoltage,
+                CM.MM.BMS_Slave1.packSOC,CM.MM.BMS_Slave1.isFault,'slave1',CM.MM.BMS_Slave1.isOnline),
+                create_battery_card('Orion Slave2 BMS',CM.MM.BMS_Slave2.instantVoltage,
+                CM.MM.BMS_Slave1.packCurrent,CM.MM.BMS_Slave1.packCurrent*CM.MM.BMS_Slave1.instantVoltage,
+                CM.MM.BMS_Slave1.packSOC,CM.MM.BMS_Slave1.isFault,'slave2',CM.MM.BMS_Slave2.isOnline),
+                ]
+        else: 
+            print("Start reading timer")
+            CM.startCANBusRead()
+
         
-    # test_value = str(OrionPCAN.MM.CANMsgs_Master[0].value)
-    # #test_value  = n
+    else:
+        connectStringTemp = ""
+        if CM.startCANDevice():
+            print("CANBus started successfully")
+            connectStringTemp = "CANBus connection successful ! "
+        else:
+            # connectAttempt = connectAttempt + 1
+            # connectStringTemp = connectString
+            # for x in range(0,connectAttempt):
+            #     connectStringTemp = connectStringTemp + "."
+            # if connectAttempt == 10:
+            #     connectAttempt = 1
+            # print(connectStringTemp)
+            print("still trying to connect")
+            connectStringTemp = "Trying to connect to CANBus \n Make sure the device is connected properly."
+        print("____________####_____still trying to connect____######__________")
+        return html.Span(className="loading_screen",children=["{s}".format(s=connectStringTemp)])
+        
+        #return  [create_battery_card('Orion Slave2',0,0,0,0,False,'slave2')]
 
-    # style = {'padding': '5px', 'fontSize': '16px'}
-    # if OrionPCAN.get_running_state:
-    #     #return html.Span(test_value,style=style)
-    #     return msg_list
-    # else:
-    #     return html.Span('The bus is not running anymore bru:',style=style)
+    
+    
 
-@app.callback(
-    Output("masterCombinedSelected","children"),
-    Input("master_combined","n_clicks"),
-)
-def update_state(n_clicks):
-    return "Master-Combined selected {n} times".format(n=n_clicks)
+# @app.callback(
+#     Output("masterCombinedSelected","children"),
+#     Input("master_combined","n_clicks"),
+# )
+# def update_state(n_clicks):
+#     return "Master-Combined selected {n} times".format(n=n_clicks)
 
-@app.callback(
-    Output("masterSelected","children"),
-    Input("master","n_clicks"),
-)
-def update_state(n_clicks):
-    return "Master selected {n} times".format(n=n_clicks)
+# @app.callback(
+#     Output("masterSelected","children"),
+#     Input("master","n_clicks"),
+# )
+# def update_state(n_clicks):
+#     return "Master selected {n} times".format(n=n_clicks)
 
-@app.callback(
-    Output("slave1Selected","children"),
-    Input("slave1","n_clicks"),
-)
-def update_state(n_clicks):
-    return "Slave 1 selected {n} times".format(n=n_clicks)
+# @app.callback(
+#     Output("slave1Selected","children"),
+#     Input("slave1","n_clicks"),
+# )
+# def update_state(n_clicks):
+#     return "Slave 1 selected {n} times".format(n=n_clicks)
 
 @app.callback(
     Output("slave2Selected","children"),
@@ -149,33 +204,14 @@ def update_state(n_clicks):
 def update_state(n_clicks):
     return "Slave 2 selected {n} times".format(n=n_clicks)
 
-def update_state(n_clicks):
-    return "testing phase"
-    # if (n_clicks%2) != 0:
-    #     OrionPCAN.start_reading()
-    #     print('started_probably')
-    # else:
-    #     OrionPCAN.stop_reading
-    #     print("stopped .... probably")
-
-    # if OrionPCAN.get_running_state:
-    #     return "The bus seems to be running"
-    # else:
-    #     return "The bus is not running anymore bruh"
-
 
 
 
 #run if this is the main script being run
 if __name__ == '__main__':
-    if IS_WINDOWS:
-        ## Starts the program
-        #TimerRead()
-        print("timerread")
-        
-        #Run windows with PCAN device reader
-    else:
-        #Run Raspberry pi setup with socketCAN
-        print("gogo raspberry")
-    # have some sort of indicatio that the background tasks are indeed running
+    #Start flask app
     app.run_server(debug=False)
+    #CM.startCAN()
+    ## Reading messages...
+    # have some sort of indicatio that the background tasks are indeed running
+    #
