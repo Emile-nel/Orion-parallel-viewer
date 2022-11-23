@@ -3,21 +3,24 @@
     flex-direction: column;
     align-items: center;
     width : 100%;
-    height: 544px;
+    min-height: 800px;
+    /* height: 800px; */
     background-color: rgb(35,43,58);
+    padding-bottom: 50px;
     /* padding: 30px; */
     /* overflow:hidden; */
-    
-
 }
 body {
     background-color:  white;
+    /* color: black; */
     color: white;
+    
     
 
     /* width: 960px; */
 }
 p {
+    /* color: black; */
     color: white;
 }
 
@@ -33,6 +36,11 @@ p {
     margin-bottom: 20px;
 
 
+}
+.width_constraint {
+    width:85%;
+    max-width:800px;
+    min-width:700px;
 }
 
 .tile-image {
@@ -67,4 +75,39 @@ p {
     font-size: 24px;
     margin: auto;
     padding-top:200px;
+}
+
+.battery_info {
+    width: 100%;
+    
+}
+
+
+
+.info_row{
+    width: 100%;
+    height: 30px;
+    color: white;
+
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border-radius: 5px;
+    border: 1px black solid;
+    margin: 2px;
+    
+    
+
+}
+
+.info_value {
+    height: 100%;
+    background: #ffffff10;
+    border-radius: 5px;
+    margin-right: 2px;
+    color: white;
+    text-align: center;
+    max-width: 80px;
+    
 }

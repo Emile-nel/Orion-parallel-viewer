@@ -3,6 +3,7 @@ import os
 import time
 import threading
 from MessageManager import *
+import can #sudo apt install python3-can
 
 IS_WINDOWS = platform.system() == 'Windows'
 if IS_WINDOWS: 
@@ -89,6 +90,12 @@ class ManageCan():
             #     connectAttempt += 1
             
             print("Connection successful. You can Read some CANBus data now")
+        else:
+            print("Starting SocketCan device")
+            os.system('sudo ip link set can0 type can bitrate 500000')
+            os.system('sudo ifconfig can0 up')
+            self.bus = can.interface.Bus(channel = 'can0', bustype = 'socketcan')
+
     #Starts the timer repeater that reads the CANBus periodically
     def startCANBusRead(self): #initialize  and start the CANBus reading    
         self.m_objTimer = TimerRepeater("ReadMessages",(self.TimerInterval/1000), self.ReadCAN)
@@ -130,6 +137,29 @@ class ManageCan():
             if stsResult != PCAN_ERROR_OK and stsResult != PCAN_ERROR_QRCVEMPTY:
                 self.ShowStatus(stsResult)
                 return
+    def BMSResetAll(self):
+
+        """
+        Sends a CANBus message that resets all ORION BMS devices on the network.
+        Call to log the reset as well, given that the BMS is online. 
+        
+        """
+        print("this resets all the BMSs")
+        self.WriteMessages(0x7df,8,[0x01, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],False)
+        timeStamp = time.time()
+        if self.MM.BMS_Master_Combined.isOnline:
+            self.MM.BMS_Master_Combined.log_reset(timeStamp)
+        if self.MM.BMS_Master.isOnline:
+            self.MM.BMS_Master.log_reset(timeStamp)
+        if self.MM.BMS_Slave1.isOnline:
+            self.MM.BMS_Slave1.log_reset(timeStamp)
+        if self.MM.BMS_Slave2.isOnline:
+            self.MM.BMS_Slave2.log_reset(timeStamp)
+        if self.MM.BMS_Slave3.isOnline:
+            self.MM.BMS_Slave3.log_reset(timeStamp)
+        
+        
+
 
     def ReadMessage(self):
         """
@@ -150,6 +180,54 @@ class ManageCan():
         else:
             print("There seems to be a CANBus error. ERROR : {}".format(stsResult[0]))    
         return stsResult[0]
+    def WriteMessages(self,ID,LEN,DATA,isExtended):
+        '''
+        Function for writing PCAN-Basic messages
+        '''
+        if IS_WINDOWS:
+            
+            stsResult = self.WriteMessage(ID,LEN,DATA,isExtended)
+        else:
+            self.WriteMessageSocketCAN(ID,LEN,DATA,isExtended)
+            print("rpi writing")
+            #write using r-pi
+        ## Checks if the message was sent
+
+
+    def WriteMessage(self,ID,LEN,DATA,isExtended):
+        """
+        Function for writing messages on CAN devices
+
+        Returns:
+            A TPCANStatus error code
+        """
+        ## Sends a CAN message with extended ID, and 8 data bytes
+        #0x7df
+        #data=[0x01, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
+        
+        msgCanMessage = TPCANMsg()
+        msgCanMessage.ID = ID
+        msgCanMessage.LEN = LEN
+        if isExtended:
+            msgCanMessage.MSGTYPE = PCAN_MESSAGE_EXTENDED.value
+        for i in range(8):
+            msgCanMessage.DATA[i] = DATA[i]
+        
+
+        stsResult = self.m_objPCANBasic.Write(self.PcanHandle, msgCanMessage)
+        print("trying to send message")
+        if (stsResult != PCAN_ERROR_OK):
+            self.ShowStatus(stsResult)
+        else:
+            print("Message was successfully SENT")
+        return stsResult
+        
+
+    def WriteMessageSocketCAN(self,ID,LEN,DATA,isExtended):
+        msg = can.Message(arbitration_id=ID, data=DATA, is_extended_id=False)
+        self.bus.send(msg)
+        print("writing with opencan")
+
 
     def ProcessMessageCan(self,msg,itstimestamp):
         """
