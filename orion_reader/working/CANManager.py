@@ -55,6 +55,7 @@ class ManageCan():
                 self.m_objPCANBasic = PCANBasic()
                 self.m_DLLFound = self.CheckForLibrary()
                 print("Library found !! ")
+                #time.sleep(1)
             except :
                 print("Unable to find the library: PCANBasic.dll !")
                 print("Press any key to close")
@@ -170,9 +171,10 @@ class ManageCan():
         """
         ## We execute the "Read" function of the PCANBasic   
         stsResult = self.m_objPCANBasic.Read(self.PcanHandle)
-
+        #print("message read")
         if stsResult[0] == PCAN_ERROR_OK:
             ## We show the received message
+           
             self.ProcessMessageCan(stsResult[1],int(time.time()))
         elif stsResult[0] == PCAN_ERROR_QRCVEMPTY:
             #print("CANBus Queue is empty")

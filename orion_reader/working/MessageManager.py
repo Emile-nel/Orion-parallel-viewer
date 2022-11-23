@@ -33,7 +33,27 @@ class BMSUnit():
     BMSErrorLogPath = ""
     BMSName = ""
     erorLogHeader = ["DateTime","Log Description","Action"]
-    prevOnlineStatus = False
+    prevOnlineStatus = True
+    instantVoltage  = 0
+    packCurrent     = 0
+    packSOC         = 0
+    packDCL         = 0
+    packCCL         = 0
+    relayState      = False
+    isFault         = False
+    allowCharge     = False
+    faultList       = []
+    highCellVoltage : int = 0
+    highCellId      = 0
+    lowCellVoltage  = 0
+    lowCellId       = 0
+    isBalancing     = False
+    highTemp        = 0
+    lowTemp         = 0
+    heatSinkTemp    = 0
+    lastOnline      = None,
+    isOnline         = False,
+    activeFaults    =[]
     
     #threshold for BMS offline trigger.(seconds)
     offlineTimeDelta = 5
@@ -41,62 +61,12 @@ class BMSUnit():
     for i in range(1,45,1):
                 cell_info.append({'Broadcast_Cell_ID':i,'Broadcast_Cell_Intant_Voltage': 0.0, 'Broadcast_Cell_Resistance': 0.0,'Broadcast_Cell_Open_Voltage' : 0.0})
 
-    def __init__(self,
+    def __init__(self,unitType : int ):
     
-    unitType : int        = 0,# = master, 1= slave
-    instantVoltage  = 0,
-    packCurrent     = 0,
-    packSOC         = 0,
-    packDCL         = 0,
-    packCCL         = 0,
-    relayState      = False,
-    isFault         = False,
-    allowCharge     = False,
-    faultList       = None,
-    highCellVoltage : int = 0,
-    highCellId      = 0,
-    lowCellVoltage  = 0,
-    lowCellId       = 0,
-    isBalancing     = False,
-    highTemp        = 0,
-    lowTemp         = 0,
-    heatSinkTemp    = 0,
-    lastOnline      = None,
-    isOnline         = False,
-    activeFaults    =[],
-    ):
+        
+
+        self.lastOnline = time.time()
         self.unitType           = unitType          ,
-        self.instantVoltage     = instantVoltage    ,
-        self.packCurrent        = packCurrent       ,
-        self.packSOC            = packSOC           ,
-        self.packDCL            = packDCL           ,
-        self.packCCL            = packCCL           ,
-        self.relayState         = relayState        ,
-        self.isFault            = isFault           ,
-        self.allowCharge        = allowCharge       ,
-        self.faultList          = faultList         ,
-        self.highCellVoltage    = highCellVoltage   ,
-        self.highCellId         = highCellId        ,
-        self.lowCellVoltage     = lowCellVoltage    ,
-        self.lowCellId          = lowCellId         ,
-        self.isBalancing        = isBalancing       ,
-        self.highTemp           = highTemp          ,
-        self.lowTemp            = lowTemp           ,
-        self.heatSinkTemp       = heatSinkTemp      ,
-        self.lastOnline         = lastOnline        ,
-        self.isOnline           = isOnline          ,
-        self.activeFaults       = activeFaults      ,
-
-        self.lastOnline = 0
-        self.instantVoltage = 0
-        self.packCCL = 0
-        self.packCurrent = 0
-        self.packSOC =0
-        self.isOnline = False
-        self.activeFaults = [] #Start with empty list of faults
-        self.isFault = False
-        self.relayState = False
-
         print('Get current working directory : ', os.getcwd())
         #set BMS Name 
         if self.unitType[0] == BMSOrder.Combined :
@@ -119,7 +89,7 @@ class BMSUnit():
     
         if not os.path.exists(self.BMSErrorLogPath):
             print("log does not exist")
-            with open(self.BMSErrorLogPath,'wb') as file:
+            with open(self.BMSErrorLogPath,'w',newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(self.erorLogHeader)
 
@@ -173,10 +143,12 @@ class BMSUnit():
                             writer.writerow(errorData)  
                     self.isOnline = False
                     self.prevOnlineStatus = False
-                    print("Previous online status set to {}".format(self.prevOnlineStatus))
+                    self.packCurrent =0
+                    self.packSOC = 0
+                    #print("Previous online status set to {}".format(self.prevOnlineStatus))
                 else:
                     if not self.prevOnlineStatus:
-                        with open(self.BMSErrorLogPath,'a') as file: #Write to CSV file
+                        with open(self.BMSErrorLogPath,'a', newline='') as file: #Write to CSV file
                             writer = csv.writer(file)
                             errorDesc = self.BMSName+" Communication failure"
                             errorData = [datetime.fromtimestamp(self.lastOnline),errorDesc,"Cleared"]
@@ -194,7 +166,7 @@ class BMSUnit():
         self.lastOnline = timeStamp
         if name == 'Pack_Current':
             self.packCurrent = value
-            #print("PACK Current = {}".format(self.unitType, value))  
+            #print("PACK Current = {}".format(value))  
         elif name == 'Inst_Voltage'   :                      
             self.instantVoltage    = value  
         elif name == 'Pack_SOC'   :                          
@@ -238,7 +210,7 @@ class BMSUnit():
             if value:              
                 if name not in self.activeFaults: #Only add fault to list if not already there
                     self.activeFaults.append(name)
-                    with open(self.BMSErrorLogPath,'w', newline='') as file: #Write to CSV file
+                    with open(self.BMSErrorLogPath,'a', newline='') as file: #Write to CSV file
                         writer = csv.writer(file)
                         errorData = [datetime.fromtimestamp(timeStamp),name,"Raised"]
                         writer.writerow(errorData)
@@ -248,7 +220,7 @@ class BMSUnit():
 
                     if (name in self.activeFaults): #Clear Fault from active fault list
                         self.activeFaults.remove(name)
-                        with open(self.BMSErrorLogPath,'w', newline='') as file: #Write to CSV file
+                        with open(self.BMSErrorLogPath,'a', newline='') as file: #Write to CSV file
                             writer = csv.writer(file)
                             errorData = [datetime.fromtimestamp(timeStamp),name,"Cleared"]
                             writer.writerow(errorData)
@@ -290,15 +262,22 @@ class BMSUnit():
             return errorList
 
     def log_reset(self, timeStamp):
-        with open(self.BMSErrorLogPath,'w', newline='') as file: #Write to CSV file
+        with open(self.BMSErrorLogPath,'a', newline='') as file: #Write to CSV file
             writer = csv.writer(file)
             resetData = [datetime.fromtimestamp(timeStamp),"BMS Reset by operator","N/A"]
             writer.writerow(resetData)        
 
 
 class CombinedBMSUnit(BMSUnit):
-    def __init__(self,) -> None:
-        pass
+    def __init__(self,unitType):
+        BMSUnit.__init__(self,unitType)
+
+    #parallel strings connected
+    #parallel allow charge
+    #parallel allow discharge
+    
+
+
 
 class CANMessage:
 
@@ -557,8 +536,8 @@ class MessageManager():
     cell_info       = {0xe3:[],0xe4:[],0xe5:[],0xe6:[]}
     cell_broadcast_ids = [0xe3,0xe4,0xe5,0xe6] 
 
-    #BMS_Master_Combined = CombinedBMSUnit(unitType=BMSOrder.Combined)
-    BMS_Master_Combined = BMSUnit(unitType=BMSOrder.Combined)
+    BMS_Master_Combined = CombinedBMSUnit(unitType=BMSOrder.Combined)
+    #BMS_Master_Combined = BMSUnit(unitType=BMSOrder.Combined)
     BMS_Master = BMSUnit(unitType=BMSOrder.Master)
     BMS_Slave1 = BMSUnit(unitType=BMSOrder.Slave1)
     BMS_Slave2 = BMSUnit(unitType=BMSOrder.Slave2)

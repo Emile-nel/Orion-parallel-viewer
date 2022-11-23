@@ -1,0 +1,94 @@
+    if CM.isConnected:
+        #Check if the CANbus is being read periodically. 
+        if CM.isRunning:
+            
+            onlineStatus = CM.MM.BMS_Master.isOnline
+            #print("Master has a fault : {}".format(CM.MM.BMS_Master.isFault))
+           # print(CM.MM.BMS_Master.cell_info[0])
+
+
+
+            # #check if a battery was selected
+            # if n_master_combined > 0:
+            #     DP.masterCombinedSelected = True
+            #     infoBMS = CM.MM.BMS_Master_Combined
+            #     n_master_combined = 0 #Set to zero to avoid a loop
+            # if n_master > 0:
+            #     DP.masterCombinedSelected = True
+            #     infoBMS = CM.MM.BMS_Master_Combined
+            #     n_master = 0 #Set to zero to avoid a loop
+            # if n_slave1> 0:
+            #     DP.masterCombinedSelected = True
+            #     infoBMS = CM.MM.BMS_Master_Combined
+            #     n_slave1 = 0 #Set to zero to avoid a loop
+            # if n_slave2 > 0:
+            #     DP.masterCombinedSelected = True
+            #     infoBMS = CM.MM.BMS_Master_Combined
+            #     n_slave2 = 0 #Set to zero to avoid a loop
+
+            #Check that more than one battery was selected. If so, make all false to avoid crashing
+            # if (int(DP.masterCombinedSelected) + int(DP.masterSelected) + int(DP.slave1Selected) + int(DP.slave2Selected) + int(DP.slave3Selected)) > 1:
+            #     DP.masterCombinedSelected = False
+            #     DP.masterSelected = False
+            #     DP.slave1Selected = False
+            #     DP.slave2Selected = False
+            #     DP.slave3Selected = False
+
+            
+            # if DP.masterCombinedSelected or DP.masterSelected or DP.slave1Selected or DP.slave2Selected or DP.slave3Selected:
+            #     if n_info > 0 : #back button
+            #         n_info = 0 #Avoid loops
+            #         DP.masterCombinedSelected = False
+            #         DP.masterSelected = False
+            #         DP.slave1Selected = False
+            #         DP.slave2Selected = False
+            #         DP.slave3Selected = False        
+            if DP.masterCombinedSelected :
+                print("Something")
+                
+            else:
+                return [
+                                  # Input("master_combined","n_clicks"),
+                    # Input("master","n_clicks"),
+                    # Input("slave1","n_clicks"),
+                    # Input("slave2","n_clicks"),
+                    create_battery_card(CM.MM.BMS_Master_Combined,"master_combined"),               
+                    create_battery_card(CM.MM.BMS_Master,"master"),
+                    create_battery_card(CM.MM.BMS_Slave1,"slave1"),
+                    create_battery_card(CM.MM.BMS_Slave2,"slave2"),
+                    create_battery_info(CM.MM.BMS_Master),
+                    html.Div(children=[get_active_alarms(CM.MM.BMS_Master)]) 
+
+                    
+                    
+                    
+                    # html.Div("Master Combined selected {n} times".format(n=n_master_combined)),
+                    # html.Div("Master  selected {n} times".format(n=n_master)),
+                    # html.Div("Slave1  selected {n} times".format(n=n_slave1)),
+                    # html.Div("Slave2  selected {n} times".format(n=n_slave2)),
+
+                    ]
+        else: 
+            print("Start reading timer")
+            CM.startCANBusRead()
+
+        
+    else:
+        connectStringTemp = ""
+        if CM.startCANDevice():
+            print("CANBus started successfully")
+            connectStringTemp = "CANBus connection successful ! "
+        else:
+            # connectAttempt = connectAttempt + 1
+            # connectStringTemp = connectString
+            # for x in range(0,connectAttempt):
+            #     connectStringTemp = connectStringTemp + "."
+            # if connectAttempt == 10:
+            #     connectAttempt = 1
+            # print(connectStringTemp)
+            print("still trying to connect")
+            connectStringTemp = "Trying to connect to CANBus \n Make sure the device is connected properly."
+        print("____________####_____still trying to connect____######__________")
+        return html.Span(className="loading_screen",children=["{s}".format(s=connectStringTemp)])
+        
+  

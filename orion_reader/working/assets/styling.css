@@ -3,7 +3,7 @@
     flex-direction: column;
     align-items: center;
     width : 100%;
-    min-height: 800px;
+    min-height: 544px;
     /* height: 800px; */
     background-color: rgb(35,43,58);
     padding-bottom: 50px;
@@ -37,6 +37,40 @@ p {
 
 
 }
+.top_banner{
+    font-size: 25px;
+    padding-top: 10px;
+}
+
+.back-button {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    top: 8px;
+    left: 16px;
+
+}
+.back_tile {
+    width : 90%;
+    height: 38px;
+    background-color: rgb(18,26,39);
+    
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    text-align: left;    
+}
+
+.reset_tile {
+    width : 500px;
+    height: 38px;
+    background-color: rgb(18,26,39);
+    border-radius: 25px;
+    margin: auto;
+    margin-top: 20px;
+    /* margin-bottom: 20px; */
+    text-align: center;
+}
 .width_constraint {
     width:85%;
     max-width:800px;
@@ -67,16 +101,19 @@ p {
 }
 
 .loading_screen {
-    display: inline-block;
-    height: 544px;
+    /* display: inline-block; */
+    height: 300px;
     width: 100%;
     text-align: center;
-    vertical-align: middle;
+    /* vertical-align: middle; */
     font-size: 24px;
     margin: auto;
-    padding-top:200px;
+    padding-top:20px;
 }
 
+.loading_img{
+    height: 100%;
+}
 .battery_info {
     width: 100%;
     
@@ -94,11 +131,14 @@ p {
     padding-top: 2px;
     padding-bottom: 2px;
     border-radius: 5px;
-    border: 1px black solid;
+    /* border: 1px black solid; */
     margin: 2px;
-    
+    background-color: rgb(18,26,39);
     
 
+}
+.info_row, div {
+    padding: 0;
 }
 
 .info_value {
