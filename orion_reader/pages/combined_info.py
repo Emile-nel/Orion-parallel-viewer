@@ -10,13 +10,14 @@ import dash_bootstrap_components as dbc
 
 #dash.register_page(__name__)
 
-def create_battery_info(BMS : BMSUnit):
+def create_combined_info(BMS : CombinedBMSUnit):
 
     
     voltage = BMS.instantVoltage
     soc = BMS.packSOC
     current = BMS.packCurrent
     power = voltage*current
+
     #print("this is the battery info card")
     if BMS.isOnline:
         if BMS.isFault:

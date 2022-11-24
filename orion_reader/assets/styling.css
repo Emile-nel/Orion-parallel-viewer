@@ -51,7 +51,7 @@ p {
 
 }
 .back_tile {
-    width : 90%;
+    width : 100%;
     height: 38px;
     background-color: rgb(18,26,39);
     
@@ -59,6 +59,10 @@ p {
     margin-top: 20px;
     margin-bottom: 10px;
     text-align: left;    
+}
+.back_tile_parent {
+    width: 100%;
+    max-width: 800px;
 }
 
 .reset_tile {
@@ -141,13 +145,20 @@ p {
     padding: 0;
 }
 
+.info_row_parent {
+    width: 90%;
+    max-width:800px ;
+}
+
 .info_value {
-    height: 100%;
+    height: 26px;
     background: #ffffff10;
     border-radius: 5px;
     margin-right: 2px;
     color: white;
     text-align: center;
     max-width: 80px;
+    margin-top: 2px;
+    
     
 }

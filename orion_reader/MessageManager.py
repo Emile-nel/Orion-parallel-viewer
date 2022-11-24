@@ -42,6 +42,7 @@ class BMSUnit():
     relayState      = False
     isFault         = False
     allowCharge     = False
+    allowDischarge  = False
     faultList       = []
     highCellVoltage : int = 0
     highCellId      = 0
@@ -170,9 +171,7 @@ class BMSUnit():
         elif name == 'Inst_Voltage'   :                      
             self.instantVoltage    = value  
         elif name == 'Pack_SOC'   :                          
-            self.packSOC        = value  
-            
-            
+            self.packSOC        = value            
         elif name == 'Relay_State'    :   
             self.relayState        = value                    
         elif name == 'Pack_DCL'   :
@@ -206,10 +205,17 @@ class BMSUnit():
 
         if name in faultKeys:#Check if msg name is a fault code
             self.faultList[name] = value #set fault status of  specific code
-            
-            if value:              
-                if name not in self.activeFaults: #Only add fault to list if not already there
-                    self.activeFaults.append(name)
+            #print("active faults {}".format(self.activeFaults))
+            name_list = [] 
+            for alarm in self.activeFaults:
+                name_list.append(alarm[0])
+
+                
+            if value:  
+        
+                if name not in name_list: #Only add fault to list if not already there
+                    alarm_list = [name,timeStamp]
+                    self.activeFaults.append(alarm_list)
                     with open(self.BMSErrorLogPath,'a', newline='') as file: #Write to CSV file
                         writer = csv.writer(file)
                         errorData = [datetime.fromtimestamp(timeStamp),name,"Raised"]
@@ -218,7 +224,7 @@ class BMSUnit():
             else:
                 if self.isOnline:#Only clear faults if BMS is Online
 
-                    if (name in self.activeFaults): #Clear Fault from active fault list
+                    if (name in name_list): #Clear Fault from active fault list
                         self.activeFaults.remove(name)
                         with open(self.BMSErrorLogPath,'a', newline='') as file: #Write to CSV file
                             writer = csv.writer(file)
@@ -234,6 +240,22 @@ class BMSUnit():
             isFaultCheck = False
             for key in faultKeys:
                 isFaultCheck = isFaultCheck & self.faultList[key]
+    
+    def get_active_alarms(self):
+        activeAlarmList = []
+        if len(self.activeFaults) == 0:
+            activeAlarmList = [['No active alarms','']]
+        else:
+            
+            for alarm in self.activeFaults:
+                human_alarm = [alarm[0],datetime.fromtimestamp(alarm[1])]
+                activeAlarmList.append(human_alarm)
+
+        return activeAlarmList
+
+    def Extract(lst):
+        return [item[0] for item in lst]
+
     def get_alarm_history(self):
         #return a list of historic alarms with raised timestamp (newest first)
         errorList = []
@@ -262,6 +284,7 @@ class BMSUnit():
             return errorList
 
     def log_reset(self, timeStamp):
+        print("resetting bms")
         with open(self.BMSErrorLogPath,'a', newline='') as file: #Write to CSV file
             writer = csv.writer(file)
             resetData = [datetime.fromtimestamp(timeStamp),"BMS Reset by operator","N/A"]
@@ -394,6 +417,7 @@ class MessageManager():
     CANMessage('Balancing_Active',                          0x3b3,24,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master), 
     CANMessage('MultiPurpose_Enable',                       0x3b3,25,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master), 
     CANMessage('Charge Enable Inverted',                    0x3b3,26,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master),
+    CANMessage('Discharge Enable Inverted',                 0x3b3,27,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master),
     CANMessage('Parallel Combined Charge Enable Inverted',  0x3b3,30,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master), 
     CANMessage('Parallel Combined Faults Present',          0x3b3,31,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master), 
 
@@ -433,6 +457,7 @@ class MessageManager():
     CANMessage('Balancing_Active',                          0x4b3,24,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave1), 
     CANMessage('MultiPurpose_Enable',                       0x4b3,25,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave1), 
     CANMessage('Charge Enable Inverted',                    0x4b3,26,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave1),
+    CANMessage('Discharge Enable Inverted',                 0x4b3,27,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave1),
         #Slave2 Unit messages
     CANMessage('Pack_Current',                              0x5b1,0,16,BitOrder.MSB,ByteOrder.BigEndian,0.1,BMSOrder.Slave2),
     CANMessage('Inst_Voltage',                              0x5b1,16,16,BitOrder.MSB,ByteOrder.BigEndian,0.1,BMSOrder.Slave2),
@@ -469,6 +494,7 @@ class MessageManager():
     CANMessage('Balancing_Active',                          0x5b3,24,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave2), 
     CANMessage('MultiPurpose_Enable',                       0x5b3,25,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave2), 
     CANMessage('Charge Enable Inverted',                    0x5b3,26,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave2),
+    CANMessage('Discharge Enable Inverted',                 0x5b3,27,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave2),
         #Slave2 Unit messages
     CANMessage('Pack_Current',                              0x6b1,0,16,BitOrder.MSB,ByteOrder.BigEndian,0.1,BMSOrder.Slave3),
     CANMessage('Inst_Voltage',                              0x6b1,16,16,BitOrder.MSB,ByteOrder.BigEndian,0.1,BMSOrder.Slave3),
@@ -505,6 +531,7 @@ class MessageManager():
     CANMessage('Balancing_Active',                          0x6b3,24,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave3), 
     CANMessage('MultiPurpose_Enable',                       0x6b3,25,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave3), 
     CANMessage('Charge Enable Inverted',                    0x6b3,26,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave3),
+    CANMessage('Discharge Enable Inverted',                 0x3b3,27,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave3),
 
 #Master combined BMS
 
