@@ -70,21 +70,21 @@ class BMSUnit():
         print('Get current working directory : ', os.getcwd())
         #set BMS Name 
         if self.unitType[0] == BMSOrder.Combined :
-            self.BMSErrorLogPath = "Orion_Combined_Error_Log.csv"
+            self.BMSErrorLogPath = "error_logs\Orion_Combined_Error_Log.csv"
             self.BMSName = "Master Combined"         
         elif self.unitType[0] == BMSOrder.Master :            
-            self.BMSErrorLogPath = "Orion_Master_Error_Log.csv"
+            self.BMSErrorLogPath = "error_logs\Orion_Master_Error_Log.csv"
             self.BMSName = "Master BMS"
         elif self.unitType[0] == BMSOrder.Slave1 :        
-            self.BMSErrorLogPath = "Orion_Slave1_Error_Log.csv"
+            self.BMSErrorLogPath = "error_logs\Orion_Slave1_Error_Log.csv"
             self.BMSName = "Slave1 BMS"
         elif self.unitType[0] == BMSOrder.Slave2 :
-            self.BMSErrorLogPath = "Orion_Slave2_Error_Log.csv"
+            self.BMSErrorLogPath = "error_logs\Orion_Slave2_Error_Log.csv"
             self.BMSName = "Slave2 BMS"
         elif self.unitType[0] == BMSOrder.Slave3 :          
-            self.BMSErrorLogPath = "Orion_Slave3_Error_Log.csv"
+            self.BMSErrorLogPath = "error_logs\Orion_Slave3_Error_Log.csv"
             self.BMSName = "Slave3 BMS"
-        #print(self.BMSErrorLogPath)
+        #print(self.BMSErrorLogPath) 
         #check if error log exists, create one if not
     
         if not os.path.exists(self.BMSErrorLogPath):

@@ -56,6 +56,7 @@ DP.BMSSelected = CM.MM.BMS_Master
 cell_id = 0
  
 def load_tiles(batteryTileStyle):
+    """ returns a list of all the battery tiles """
     return html.Div(style=batteryTileStyle, children=[
             create_battery_card(CM.MM.BMS_Master_Combined,"master_combined"),               
             create_battery_card(CM.MM.BMS_Master,"master"),

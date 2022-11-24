@@ -1,0 +1,10 @@
+DateTime,Log Description,Action
+2022-11-24 08:41:48,DTC P0A80 : Weak Cell,Raised
+2022-11-24 08:41:48,DTC P0A04 : Cell Open Wiring,Raised
+2022-11-24 08:41:48,DTC P0AA6 : High Voltage Isolation,Raised
+2022-11-24 08:45:34,DTC P0A80 : Weak Cell,Raised
+2022-11-24 08:45:34,DTC P0A04 : Cell Open Wiring,Raised
+2022-11-24 08:45:34,DTC P0AA6 : High Voltage Isolation,Raised
+2022-11-24 08:48:00,DTC P0A80 : Weak Cell,Raised
+2022-11-24 08:48:00,DTC P0A04 : Cell Open Wiring,Raised
+2022-11-24 08:48:00,DTC P0AA6 : High Voltage Isolation,Raised
