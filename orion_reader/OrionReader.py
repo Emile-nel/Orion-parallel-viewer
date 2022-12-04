@@ -18,6 +18,9 @@ from pages.battery_info import create_battery_info
 from pages.active_alarms import create_active_alarms
 from pages.battery_card import create_battery_card
 from pages.historic_alarms import create_alarm_history
+from pages.io_conditions import create_io_conditions
+#from pages.combined_info import create_combined_info
+from pages.parallel_battery_card import create_parallel_battery_card
 
 
 
@@ -61,7 +64,7 @@ def load_tiles(batteryTileStyle, show : bool):
     """ returns a list of all the battery tiles """
 
     return html.Div(style=batteryTileStyle, children=[
-            create_battery_card(CM.MM.BMS_Master_Combined,"master_combined"),               
+            create_parallel_battery_card(CM.MM.BMS_Master_Combined,"master_combined"),               
             create_battery_card(CM.MM.BMS_Master,"master"),
             create_battery_card(CM.MM.BMS_Slave1,"slave1"),
             create_battery_card(CM.MM.BMS_Slave2,"slave2"),
@@ -108,15 +111,9 @@ app.layout = html.Div([
 
 @app.callback(  
                     Output('main_display', 'children'),
-                    # Output('battery-card-tile','n_clicks')
                     
                 [
                     Input('interval-component', 'n_intervals'),
-                    # Input('battery-card-tile','n_clicks'),
-                    # Input('battery-card-name','value')
-                    
-                    
-
                     Input("master_combined","n_clicks"),
                     Input("master","n_clicks"),
                     Input("slave1","n_clicks"),
@@ -129,16 +126,6 @@ app.layout = html.Div([
                     Input("battery_history_btn","n_clicks"),
                     Input("IO_cond_btn","n_clicks"),
                     Input("bms_reset","n_clicks"),
-                    
-                    
-
-
-
-
-                    
-                    
-                    
-
 
                 ],
                 prevent_initial_call=True,
@@ -157,6 +144,7 @@ def render_main(n, MC_n, M_n, S1_n, S2_n, back_n,cell_info_n,details_n,active_al
     cellInfoStyle = {'display':'none'}
     alarmHistoryStyle = {'display':'none'}
     activeAlarmStyle = {'display':'none'}
+    IOConditionsStyle = {'display':'none'}
 
     isFaultActive = CM.MM.BMS_Master.isFault or CM.MM.BMS_Slave1.isFault or CM.MM.BMS_Slave2.isFault
     if isFaultActive:
@@ -169,6 +157,7 @@ def render_main(n, MC_n, M_n, S1_n, S2_n, back_n,cell_info_n,details_n,active_al
     if CM.isConnected:
         #Check if the CANbus is being read periodically. 
         if CM.isRunning:
+          
 
             if DP.menuLevel == 0:
                 DP.tilesSelected = True
@@ -204,13 +193,8 @@ def render_main(n, MC_n, M_n, S1_n, S2_n, back_n,cell_info_n,details_n,active_al
                     batteryinfoStyle = {'display':'block'}
                     if back_n:
                         DP.infoSelected = False
-                        DP.infoSelected = False
-                        DP.detailsSelected = False
-                        DP.activeAlarmsSelected = False
-                        DP.alarmsHistorySelected = False
-                        DP.batteryHistorySelected = False
-                        DP.IOSelected = False
-                        DP.cellInfoSelected = False
+   
+
 
                         DP.menuLevel = 0
                         batteryinfoStyle = {'display':'none'}
@@ -225,15 +209,16 @@ def render_main(n, MC_n, M_n, S1_n, S2_n, back_n,cell_info_n,details_n,active_al
                         #DP.menuLevel = DP.menuLevel + 1
                     elif active_alarms_n:
                         print('activ alarms set')
+                        print(DP.BMSSelected.BMSName)
                         DP.activeAlarmsSelected = True
                         DP.menuLevel = 2
                     elif alarms_history_n:
                         DP.alarmsHistorySelected = True
                         DP.menuLevel = DP.menuLevel + 1
-                    elif battery_history_n:
-                        DP.batteryHistorySelected = True
                     elif IO_cond_n:
-                        DP.cellInfoSelected = True
+                        DP.IOSelected = True
+                        DP.menuLevel = 2
+                        print("io pressed")
                     else:
                         pass
             elif DP.menuLevel == 2:
@@ -245,10 +230,19 @@ def render_main(n, MC_n, M_n, S1_n, S2_n, back_n,cell_info_n,details_n,active_al
                     alarmHistoryStyle = {'display':'block'}
                 elif DP.activeAlarmsSelected:
                     activeAlarmStyle = {'display':'block'}
-                
+                elif DP.IOSelected:
+                    IOConditionsStyle =  {'display':'block'}
                 if back_n:
+
+                    DP.detailsSelected = False
+                    DP.activeAlarmsSelected = False
+                    DP.alarmsHistorySelected = False
+                    DP.batteryHistorySelected = False
+                    DP.IOSelected = False
+                    DP.cellInfoSelected = False
                     alarmHistoryStyle = {'display':'none'}
-                    activeAlarmStyle = {'display':'none'}
+                    activeAlarmStyle = {'display':'none'} 
+                    IOConditionsStyle =  {'display':'none'}
                     DP.menuLevel = 1
 
 
@@ -275,14 +269,17 @@ def render_main(n, MC_n, M_n, S1_n, S2_n, back_n,cell_info_n,details_n,active_al
     
     return [
         #loading screen
-        html.Div("Voyage Charters Battery Monitor",className='top_banner'),
-        html.Div(className = "back_tile_parent ",style = backTileStyle,  children = html.Div(className = "back_tile ",children = [dbc.Button("Back", color="secondary", className="me-1",id='back_btn')])),
+        html.Div("VOYAGE Charters Battery Monitor",className='top_banner'),
+        html.Div(className = "back_tile_parent ",style = backTileStyle,  children = html.Div(className = "back_tile ",children = [dbc.Button("Back", color="secondary", className="me-1 back-button",id='back_btn')])),
        
-        html.Div(style=loadingScreenStyle ,children=[html.Span(className="loading_screen",children=[html.Img(src="/assets/images/voyage-logo-color-dark.png",className='loading_img')])]),
+        html.Div(style=loadingScreenStyle ,children=[html.Div(className="loading_screen",children=[html.Img(src="/assets/images/voyage-logo-color-dark.png",className='loading_img')])]),
         load_tiles(batteryTileStyle, DP.tilesSelected),
         html.Div(className="info_row_parent",style=batteryinfoStyle,children=create_battery_info(DP.BMSSelected)),
         html.Div(className="info_row_parent", style=activeAlarmStyle,children=create_active_alarms(DP.BMSSelected)),
         html.Div(className="info_row_parent",style=alarmHistoryStyle,children=create_alarm_history(DP.BMSSelected)),
+        html.Div(className="info_row_parent",style=IOConditionsStyle,children=create_io_conditions(DP.BMSSelected)),
+        
+
         html.Div(style = resetTileStyle,  children = html.Div(className = "reset_tile ",children = [dbc.Button("Reset BMS", color="warning", className="me-1",id='bms_reset',n_clicks=0)])),
         #html.Div(className='reset_tile',style=resetStyle)
     
@@ -309,7 +306,7 @@ def call_bms_reset(n_clicks):
 #run if this is the main script being run
 if __name__ == '__main__':
 
-    app.run_server(debug=True)
+    app.run_server(host= '0.0.0.0',debug=False)
 
     # while not CM.isConnected:
     #     connectStringTemp = ""

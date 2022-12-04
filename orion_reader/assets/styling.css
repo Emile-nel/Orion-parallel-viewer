@@ -1,3 +1,17 @@
+body::-webkit-scrollbar {
+    width: 10px;
+  }
+   
+  body::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background: rgb(35,43,58);
+  }
+   
+  body::-webkit-scrollbar-thumb {
+    background-color: rgb(18,26,39);
+    outline: 1px solid rgb(35,43,58);
+  }
+
 .main-body {
     display: flex;
     flex-direction: column;
@@ -43,18 +57,18 @@ p {
 }
 
 .back-button {
-    position: absolute;
-    width: 50px;
+    /* position: absolute; */
+    width: 80px;
     height: 50px;
-    top: 8px;
-    left: 16px;
+    /* top: 8px;
+    left: 16px; */
 
 }
 .back_tile {
     width : 100%;
-    height: 38px;
+    height: 50px;
     background-color: rgb(18,26,39);
-    
+    border-radius: 5px;
     margin: auto;
     margin-top: 20px;
     margin-bottom: 10px;
@@ -112,7 +126,7 @@ p {
     /* vertical-align: middle; */
     font-size: 24px;
     margin: auto;
-    padding-top:20px;
+    padding-top:50px;
 }
 
 .loading_img{
@@ -127,7 +141,7 @@ p {
 
 .info_row{
     width: 100%;
-    height: 30px;
+    height: 50px;
     color: white;
 
     padding-left: 20px;
@@ -150,8 +164,12 @@ p {
     max-width:800px ;
 }
 
+.info_name{
+    line-height: 50px;
+}
+
 .info_value {
-    height: 26px;
+    height: 46px;
     background: #ffffff10;
     border-radius: 5px;
     margin-right: 2px;

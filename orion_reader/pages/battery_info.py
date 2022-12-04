@@ -151,6 +151,7 @@ def create_battery_info(BMS : BMSUnit):
                             dbc.Row(
                             className="row justify-content-end",
                             children=[
+                                dbc.Col("{}".format(len(BMS.activeFaults)),className="col info_value"),
                                 dbc.Col(">",className="col info_value"),
                             ]
                         )

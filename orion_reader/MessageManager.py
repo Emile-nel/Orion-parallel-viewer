@@ -4,8 +4,9 @@ from datetime import datetime
 import time
 import csv
 import os.path
+import platform
 
-
+IS_WINDOWS = platform.system() == 'Windows'
 
 
 class BitOrder(Enum):
@@ -29,67 +30,91 @@ class ByteOrder(Enum):
         
 
 class BMSUnit():
-    cell_info = []
-    BMSErrorLogPath = ""
-    BMSName = ""
-    erorLogHeader = ["DateTime","Log Description","Action"]
-    prevOnlineStatus = True
-    instantVoltage  = 0
-    packCurrent     = 0
-    packSOC         = 0
-    packDCL         = 0
-    packCCL         = 0
-    relayState      = False
-    isFault         = False
-    allowCharge     = False
-    allowDischarge  = False
-    faultList       = []
-    highCellVoltage : int = 0
-    highCellId      = 0
-    lowCellVoltage  = 0
-    lowCellId       = 0
-    isBalancing     = False
-    highTemp        = 0
-    lowTemp         = 0
-    heatSinkTemp    = 0
-    lastOnline      = None,
-    isOnline         = False,
-    activeFaults    =[]
+    
     
     #threshold for BMS offline trigger.(seconds)
-    offlineTimeDelta = 5
-
-    for i in range(1,45,1):
-                cell_info.append({'Broadcast_Cell_ID':i,'Broadcast_Cell_Intant_Voltage': 0.0, 'Broadcast_Cell_Resistance': 0.0,'Broadcast_Cell_Open_Voltage' : 0.0})
+    offlineTimeDelta = 10
 
     def __init__(self,unitType : int ):
+        self.cell_info = []
+        self.BMSErrorLogPath = ""
+        self.BMSName = ""
+        self.erorLogHeader = ["DateTime","Log Description","Action"]
+        self.prevOnlineStatus = True
+        self.instantVoltage  = 0
+        self.packCurrent     = 0
+        self.packSOC         = 0
+        self.packDCL         = 0
+        self.packCCL         = 0
+        self.targetMaxVoltage = 0
+        self.targetMinVoltage = 0
+        self.relayState      = False
+        self.isFault         = False
+        self.chargeSafety    = False
+        self.allowCharge     = False
+        self.allowDischarge  = False
+        self.faultList       = []
+        self.highCellVoltage : int = 0
+        self.highCellId      = 0
+        self.lowCellVoltage  = 0
+        self.lowCellId       = 0
+        self.isBalancing     = False
+        self.highTemp        = 0
+        self.lowTemp         = 0
+        self.heatSinkTemp    = 0
+        self.lastOnline      = None,
+        self.isOnline         = False,
+        self.activeFaults    =[]
+        self.activeHistoricAlarms = []
+
     
-        
+        for i in range(1,45,1):
+                   self.cell_info.append({'Broadcast_Cell_ID':i,'Broadcast_Cell_Intant_Voltage': 0.0, 'Broadcast_Cell_Resistance': 0.0,'Broadcast_Cell_Open_Voltage' : 0.0})
+    
 
         self.lastOnline = time.time()
         self.unitType           = unitType          ,
-        print('Get current working directory : ', os.getcwd())
+        pre_path = os.path.dirname(os.path.realpath(__file__))
+        
         #set BMS Name 
-        if self.unitType[0] == BMSOrder.Combined :
-            self.BMSErrorLogPath = "error_logs\Orion_Combined_Error_Log.csv"
-            self.BMSName = "Master Combined"         
-        elif self.unitType[0] == BMSOrder.Master :            
-            self.BMSErrorLogPath = "error_logs\Orion_Master_Error_Log.csv"
-            self.BMSName = "Master BMS"
-        elif self.unitType[0] == BMSOrder.Slave1 :        
-            self.BMSErrorLogPath = "error_logs\Orion_Slave1_Error_Log.csv"
-            self.BMSName = "Slave1 BMS"
-        elif self.unitType[0] == BMSOrder.Slave2 :
-            self.BMSErrorLogPath = "error_logs\Orion_Slave2_Error_Log.csv"
-            self.BMSName = "Slave2 BMS"
-        elif self.unitType[0] == BMSOrder.Slave3 :          
-            self.BMSErrorLogPath = "error_logs\Orion_Slave3_Error_Log.csv"
-            self.BMSName = "Slave3 BMS"
+        if IS_WINDOWS:
+            if self.unitType[0] == BMSOrder.Combined :
+                self.BMSErrorLogPath = pre_path+"\error_logs\Orion_Combined_Error_Log.csv"
+                self.BMSName = "Master Combined"         
+            elif self.unitType[0] == BMSOrder.Master :            
+                self.BMSErrorLogPath = pre_path+"\error_logs\Orion_Master_Error_Log.csv"
+                self.BMSName = "Master BMS"
+            elif self.unitType[0] == BMSOrder.Slave1 :        
+                self.BMSErrorLogPath = pre_path+"\error_logs\Orion_Slave1_Error_Log.csv"
+                self.BMSName = "Slave1 BMS"
+            elif self.unitType[0] == BMSOrder.Slave2 :
+                self.BMSErrorLogPath = pre_path+"\error_logs\Orion_Slave2_Error_Log.csv"
+                self.BMSName = "Slave2 BMS"
+            elif self.unitType[0] == BMSOrder.Slave3 :          
+                self.BMSErrorLogPath = pre_path+"\error_logs\Orion_Slave3_Error_Log.csv"
+                self.BMSName = "Slave3 BMS"
+        else:
+            if self.unitType[0] == BMSOrder.Combined :
+                self.BMSErrorLogPath = pre_path+"/error_logs/Orion_Combined_Error_Log.csv"
+                self.BMSName = "Master Combined"         
+            elif self.unitType[0] == BMSOrder.Master :            
+                self.BMSErrorLogPath = pre_path+"/error_logs/Orion_Master_Error_Log.csv"
+                self.BMSName = "Master BMS"
+            elif self.unitType[0] == BMSOrder.Slave1 :        
+                self.BMSErrorLogPath = pre_path+"/error_logs/Orion_Slave1_Error_Log.csv"
+                self.BMSName = "Slave1 BMS"
+            elif self.unitType[0] == BMSOrder.Slave2 :
+                self.BMSErrorLogPath = pre_path+"/error_logs/Orion_Slave2_Error_Log.csv"
+                self.BMSName = "Slave2 BMS"
+            elif self.unitType[0] == BMSOrder.Slave3 :          
+                self.BMSErrorLogPath = pre_path+"/error_logs/Orion_Slave3_Error_Log.csv"
+                self.BMSName = "Slave3 BMS"   
         #print(self.BMSErrorLogPath) 
         #check if error log exists, create one if not
     
         if not os.path.exists(self.BMSErrorLogPath):
-            print("log does not exist")
+            print("log does not exist.")
+            print("Creating log file at {}".format(self.BMSErrorLogPath))
             with open(self.BMSErrorLogPath,'w',newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(self.erorLogHeader)
@@ -123,7 +148,27 @@ class BMSUnit():
         "DTC P0A10 : Pack Too Hot"                  :   False,                 
     }
     
+    def get_active_historic_alarms (self):
         
+        with open(self.BMSErrorLogPath) as file:
+            csv_reader = csv.reader(file,delimiter=',',)
+            line_count = 0
+            #print("Printing list for {} with csv path :  {}".format(self.BMSName, self.BMSErrorLogPath))
+            for row in csv_reader:
+                    #check for valid number of columns in row
+                    if len(row) > 2:
+                        if line_count == 0:
+                            #skip the header row
+                            #print (f'Column names are {", ".join(row)}')
+                            line_count += 1
+                        else:
+                            
+
+                            listItem = [row[0],row[1] ,row[2]]
+                            
+                                #print(listItem)
+                            line_count += 1
+
     def checkOnline(self): #Compare last message time to current time
 
             #get time difference in seconds
@@ -136,24 +181,26 @@ class BMSUnit():
                 
                 #
                 if timeDelta > self.offlineTimeDelta:
-                    if self.prevOnlineStatus:
-                        with open(self.BMSErrorLogPath,'a') as file: #Write to CSV file
-                            writer = csv.writer(file)
-                            errorDesc = self.BMSName+" Communication failure"
-                            errorData = [datetime.fromtimestamp(self.lastOnline),errorDesc,"Raised"]
-                            writer.writerow(errorData)  
+                    #log comms failure. '''' REMOVED ''''
+                    # if self.prevOnlineStatus:
+                    #     with open(self.BMSErrorLogPath,'a') as file: #Write to CSV file
+                    #         writer = csv.writer(file)
+                    #         errorDesc = self.BMSName+" Communication failure"
+                    #         errorData = [datetime.fromtimestamp(self.lastOnline),errorDesc,"Raised"]
+                    #         writer.writerow(errorData)  
                     self.isOnline = False
                     self.prevOnlineStatus = False
-                    self.packCurrent =0
-                    self.packSOC = 0
+                    #self.packCurrent =0
+                    #self.packSOC = 0
                     #print("Previous online status set to {}".format(self.prevOnlineStatus))
                 else:
-                    if not self.prevOnlineStatus:
-                        with open(self.BMSErrorLogPath,'a', newline='') as file: #Write to CSV file
-                            writer = csv.writer(file)
-                            errorDesc = self.BMSName+" Communication failure"
-                            errorData = [datetime.fromtimestamp(self.lastOnline),errorDesc,"Cleared"]
-                            writer.writerow(errorData)
+                    #log comms failure. '''' REMOVED ''''
+                    # if not self.prevOnlineStatus:
+                        # with open(self.BMSErrorLogPath,'a', newline='') as file: #Write to CSV file
+                        #     writer = csv.writer(file)
+                        #     errorDesc = self.BMSName+" Communication failure"
+                        #     errorData = [datetime.fromtimestamp(self.lastOnline),errorDesc,"Cleared"]
+                        #     writer.writerow(errorData)
                     self.isOnline = True
                     self.prevOnlineStatus = True
 
@@ -163,17 +210,22 @@ class BMSUnit():
             
     def set_val(self,name,value,timeStamp):
         #Grab and store BMS Unit values
+ 
         
         self.lastOnline = timeStamp
+        self.checkOnline()
         if name == 'Pack_Current':
-            self.packCurrent = value
+            if (value == -600) and (self.isFault):
+                self.packCurrent = 0
+            else:
+                self.packCurrent = value
             #print("PACK Current = {}".format(value))  
         elif name == 'Inst_Voltage'   :                      
             self.instantVoltage    = value  
         elif name == 'Pack_SOC'   :                          
             self.packSOC        = value            
-        elif name == 'Relay_State'    :   
-            self.relayState        = value                    
+        # elif name == 'Relay_State'    :   
+        #     self.relayState        = value                    
         elif name == 'Pack_DCL'   :
             self.packDCL        = value                         
         elif name == 'Pack_CCL'   : 
@@ -184,10 +236,12 @@ class BMSUnit():
             self.lowTemp        = value
         elif name == 'Balancing_Active'  :                         
             self.isBalancing    = value
-        elif name == 'MultiPurpose_Enable'   :                      
+        elif name == 'MultiPurpose_Enable'   :            
             self.relayState     = value
         elif name == 'Charge Enable Inverted'    :                   
             self.allowCharge    = value
+        elif name == 'Discharge Enable Inverted'    :                   
+            self.allowDischarge    = value
         elif name == 'Low_Cell_Voltage':
             self.lowCellVoltage = value
         elif name == 'High_Cell_Voltage':
@@ -203,20 +257,37 @@ class BMSUnit():
         #get fault list keys
         faultKeys = list(self.faultList.keys())
 
+            
+
         if name in faultKeys:#Check if msg name is a fault code
-            self.faultList[name] = value #set fault status of  specific code
-            #print("active faults {}".format(self.activeFaults))
-            name_list = [] 
-            for alarm in self.activeFaults:
-                name_list.append(alarm[0])
+            #if self.BMSName == "Master BMS":
+                #print(self.activeFaults)
+                #print("setting {} to {}".format(name,value))
+            # prevVal = self.faultList[name]
+            # if prevVal:
+            #     #if pervious value = True and current = False, delete from list
+            #     if not value:
+            #         if name in self.activeFaults:
+            #             self.activeFaults.remove(name)
+            # else:
+            #     #if pervious value = False and current = True, append to list
+            #     if value:
+            #         self.activeFaults.append(name)
+            # #print(self.activeFaults)
+            # self.faultList[name] = value #set fault status of  specific code
+            # #print("active faults {}".format(self.activeFaults))
+  
+
 
                 
             if value:  
         
-                if name not in name_list: #Only add fault to list if not already there
-                    alarm_list = [name,timeStamp]
-                    self.activeFaults.append(alarm_list)
+                if name not in self.activeFaults: #Only add fault to list if not already there
+                
+                    self.activeFaults.append(name)
+                    print("writing {} to file".format(name))
                     with open(self.BMSErrorLogPath,'a', newline='') as file: #Write to CSV file
+                        print('Appending fault to {}'.format(self.BMSErrorLogPath))
                         writer = csv.writer(file)
                         errorData = [datetime.fromtimestamp(timeStamp),name,"Raised"]
                         writer.writerow(errorData)
@@ -224,31 +295,44 @@ class BMSUnit():
             else:
                 if self.isOnline:#Only clear faults if BMS is Online
 
-                    if (name in name_list): #Clear Fault from active fault list
+                    if (name in self.activeFaults): #Clear Fault from active fault list
+
                         self.activeFaults.remove(name)
                         with open(self.BMSErrorLogPath,'a', newline='') as file: #Write to CSV file
+                            
                             writer = csv.writer(file)
                             errorData = [datetime.fromtimestamp(timeStamp),name,"Cleared"]
                             writer.writerow(errorData)
                 
-
+        
 
         if len(self.activeFaults) > 0:
-            self.isFault = True #check if any faults active
+            #check if any faults active
+            self.isFault = True
+        else:
+            self.isFault = False
+             
         #clear isfault if none of the faults are present anymore
-        if self.isFault:
-            isFaultCheck = False
-            for key in faultKeys:
-                isFaultCheck = isFaultCheck & self.faultList[key]
+        # if self.isFault:
+        #     isFaultCheck = False
+        #     for key in faultKeys:
+        #         isFaultCheck = isFaultCheck & self.faultList[key]
     
+
+
+
     def get_active_alarms(self):
         activeAlarmList = []
+
+
+        
+        
         if len(self.activeFaults) == 0:
             activeAlarmList = [['No active alarms','']]
         else:
             
             for alarm in self.activeFaults:
-                human_alarm = [alarm[0],datetime.fromtimestamp(alarm[1])]
+                human_alarm = [alarm,"Active"]
                 activeAlarmList.append(human_alarm)
 
         return activeAlarmList
@@ -263,28 +347,34 @@ class BMSUnit():
         #print("returning list of alarms")
         with open(self.BMSErrorLogPath) as file:
             csv_reader = csv.reader(file,delimiter=',',)
-            line_count = 0
-            #print("Printing list for {} with csv path :  {}".format(self.BMSName, self.BMSErrorLogPath))
-            for row in csv_reader:
-                    if len(row) > 2:
-                        if line_count == 0:
-                            #print (f'Column names are {", ".join(row)}')
-                            line_count += 1
-                        else:
-                            if row[2] != "cleared" :
-
-                                listItem = [row[0],row[1]]
-                                errorList.append(listItem)
-                                #print(listItem)
+            try:
+                line_count = 0
+                #print("Printing list for {} with csv path :  {}".format(self.BMSName, self.BMSErrorLogPath))
+                for row in csv_reader:
+                        #check for valid number of columns in row
+                        if len(row) > 2:
+                            if line_count == 0:
+                                #skip the header row
+                                #print (f'Column names are {", ".join(row)}')
                                 line_count += 1
-            #print("There are {} items in the list".format(line_count))
-            
-            errorList.reverse()
-            #print(errorList)
-            return errorList
+                            else:
+                                
+
+                                listItem = [row[0],row[1] ,row[2]]
+                                errorList.append(listItem)
+                                    #print(listItem)
+                                line_count += 1
+                #print("There are {} items in the list".format(line_count))
+                
+                errorList.reverse()
+                #print(errorList)
+                return errorList
+            except Exception as e:
+                print("could not read from CSV because {}".format(e))
+                return errorList
 
     def log_reset(self, timeStamp):
-        print("resetting bms")
+        print("resetting {} bms")
         with open(self.BMSErrorLogPath,'a', newline='') as file: #Write to CSV file
             writer = csv.writer(file)
             resetData = [datetime.fromtimestamp(timeStamp),"BMS Reset by operator","N/A"]
@@ -292,8 +382,31 @@ class BMSUnit():
 
 
 class CombinedBMSUnit(BMSUnit):
+
     def __init__(self,unitType):
         BMSUnit.__init__(self,unitType)
+
+        self.parallelActiveStrings = 0
+
+    def set_val_combined(self,name,value,timeStamp):
+
+        self.set_val(name,value,timeStamp)
+        if name == 'Parallel_Active_Strings':
+            self.parallelActiveStrings = value
+        elif name == 'Parallel_Combined_Charger_Safety_Inverted':
+            if value:
+                self.chargeSafety = False
+            else:
+                self.chargeSafety = True
+        elif name == 'Parallel_Combined_Charge_Enable_Inverted':
+            self.allowCharge = value
+            
+        elif name == 'Parallel_Combined_Faults_Present':
+            self.isFault = value
+            
+
+
+
 
     #parallel strings connected
     #parallel allow charge
@@ -342,6 +455,7 @@ class CANMessage:
                 bitPos = self.startBit - 8*bytePos
                 bitState = bool(int(data[bytePos])&(1<<bitPos))
                 self.value = bitState
+
                 
        
             else:
@@ -390,6 +504,7 @@ class MessageManager():
     CANMessage('Pack_CCL',                                  0x3b2,16,8,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master),
     CANMessage('High_Temperature',                          0x3b2,32,8,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master),
     CANMessage('Low_Temperature',                           0x3b2,40,8,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master),
+    
     CANMessage('DTC P0A1F : Internal Cell Communication',   0x3b3,0,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master), 
     CANMessage('DTC P0A12 : Cell Balancing Stuck Off',      0x3b3,1,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master),
     CANMessage('DTC P0A80 : Weak Cell',                     0x3b3,2,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master),
@@ -418,11 +533,10 @@ class MessageManager():
     CANMessage('MultiPurpose_Enable',                       0x3b3,25,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master), 
     CANMessage('Charge Enable Inverted',                    0x3b3,26,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master),
     CANMessage('Discharge Enable Inverted',                 0x3b3,27,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master),
-    CANMessage('Parallel Combined Charge Enable Inverted',  0x3b3,30,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master), 
-    CANMessage('Parallel Combined Faults Present',          0x3b3,31,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Master), 
+
 
         #Slave1 Unit messages
-    CANMessage('Pack_Current',                              0x4b1,0,16,BitOrder.MSB,ByteOrder.BigEndian,0.1,BMSOrder.Slave1),
+    CANMessage('Pack_Current',                              0x4b1,0,16,BitOrder.MSB,ByteOrder.LittleEndian,0.1,BMSOrder.Slave1,isSigned=True),
     CANMessage('Inst_Voltage',                              0x4b1,16,16,BitOrder.MSB,ByteOrder.BigEndian,0.1,BMSOrder.Slave1),
     CANMessage('Pack_SOC',                                  0x4b1,32,8,BitOrder.MSB,ByteOrder.BigEndian,0.5,BMSOrder.Slave1),
     CANMessage('Relay_State',                               0x4b1,40,8,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave1),
@@ -459,7 +573,7 @@ class MessageManager():
     CANMessage('Charge Enable Inverted',                    0x4b3,26,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave1),
     CANMessage('Discharge Enable Inverted',                 0x4b3,27,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave1),
         #Slave2 Unit messages
-    CANMessage('Pack_Current',                              0x5b1,0,16,BitOrder.MSB,ByteOrder.BigEndian,0.1,BMSOrder.Slave2),
+    CANMessage('Pack_Current',                              0x5b1,0,16,BitOrder.MSB,ByteOrder.LittleEndian,0.1,BMSOrder.Slave2,isSigned=True),
     CANMessage('Inst_Voltage',                              0x5b1,16,16,BitOrder.MSB,ByteOrder.BigEndian,0.1,BMSOrder.Slave2),
     CANMessage('Pack_SOC',                                  0x5b1,32,8,BitOrder.MSB,ByteOrder.BigEndian,0.5,BMSOrder.Slave2),
     CANMessage('Relay_State',                               0x5b1,40,8,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave2),
@@ -531,22 +645,31 @@ class MessageManager():
     CANMessage('Balancing_Active',                          0x6b3,24,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave3), 
     CANMessage('MultiPurpose_Enable',                       0x6b3,25,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave3), 
     CANMessage('Charge Enable Inverted',                    0x6b3,26,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave3),
-    CANMessage('Discharge Enable Inverted',                 0x3b3,27,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave3),
+    CANMessage('Discharge Enable Inverted',                 0x6b3,27,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Slave3),
 
 #Master combined BMS
 
-    CANMessage('Pack_Current',                              0x3b1,0,16,BitOrder.MSB,ByteOrder.LittleEndian,0.1,BMSOrder.Combined,isSigned=True),
-    CANMessage('Inst_Voltage',                              0x3b1,16,16,BitOrder.MSB,ByteOrder.BigEndian,0.1,BMSOrder.Combined),
-    CANMessage('Pack_SOC',                                  0x3b1,32,8,BitOrder.MSB,ByteOrder.BigEndian,0.5,BMSOrder.Combined),
+    CANMessage('Inst_Voltage',                              0x356,0,16,BitOrder.MSB,ByteOrder.LittleEndian,0.01,BMSOrder.Combined),
+    CANMessage('Pack_Current',                              0x356,16,16,BitOrder.MSB,ByteOrder.LittleEndian,0.1,BMSOrder.Combined,isSigned=True),
+    
+    CANMessage('Pack_SOC',                                  0x355,0,16,BitOrder.MSB,ByteOrder.LittleEndian,1,BMSOrder.Combined),
     CANMessage('Relay_State',                               0x3b1,40,8,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Combined),
-    CANMessage('Pack_DCL',                                  0x3b2,0,16,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Combined),
-    CANMessage('Pack_CCL',                                  0x3b2,16,8,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Combined),
 
-    CANMessage('Low_Cell_Voltage',                           0x373,0,8,BitOrder.MSB,ByteOrder.LittleEndian,0.001,BMSOrder.Combined),
-    CANMessage('High_Cell_Voltage',                          0x373,8,8,BitOrder.MSB,ByteOrder.BigEndian,0.001,BMSOrder.Combined),
+    CANMessage('Parallel_Target_Max_DC_PackV',              0x351,0,16,BitOrder.MSB,ByteOrder.LittleEndian,0.1,BMSOrder.Combined),
+    CANMessage('Parallel_CCL',                              0x351,16,16,BitOrder.MSB,ByteOrder.LittleEndian,0.1,BMSOrder.Combined),
+    CANMessage('Parallel_DCL',                              0x351,32,16,BitOrder.MSB,ByteOrder.LittleEndian,0.1,BMSOrder.Combined),
+    CANMessage('Parallel_Target_Min_DC_PackV',              0x351,48,16,BitOrder.MSB,ByteOrder.LittleEndian,0.1,BMSOrder.Combined),
+
+    CANMessage('Parallel_Active_Strings',                   0x372,0,8,BitOrder.MSB,ByteOrder.LittleEndian,1,BMSOrder.Combined),
+
+    CANMessage('Low_Cell_Voltage',                          0x373,0,8,BitOrder.MSB,ByteOrder.LittleEndian,0.001,BMSOrder.Combined),
+    CANMessage('High_Cell_Voltage',                         0x373,8,8,BitOrder.MSB,ByteOrder.BigEndian,0.001,BMSOrder.Combined),
     CANMessage('Low_Temperature',                           0x373,0,8,BitOrder.MSB,ByteOrder.LittleEndian,1,BMSOrder.Combined),
     CANMessage('High_Temperature',                          0x373,8,8,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Combined),
 
+    CANMessage('Parallel_Combined_Charger_Safety_Inverted', 0x3b3,29,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Combined), 
+    CANMessage('Parallel_Combined_Charge_Enable_Inverted',  0x3b3,30,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Combined), 
+    CANMessage('Parallel_Combined_Faults_Present',          0x3b3,31,1,BitOrder.MSB,ByteOrder.BigEndian,1,BMSOrder.Combined), 
     #parallel bus voltage
     #parallel current
     #parallel charge anable
@@ -604,7 +727,9 @@ class MessageManager():
                     #Set CANBus message data
                     msg.set_val(messageData,messageTime)
                     #populate BMS data
-                    if msg.BMSNumber == BMSOrder.Master:
+                    if msg.BMSNumber == BMSOrder.Combined:
+                        self.BMS_Master_Combined.set_val_combined(msg.name,msg.value,messageTime)
+                    elif msg.BMSNumber == BMSOrder.Master:
                         self.BMS_Master.set_val(msg.name,msg.value,messageTime)
                     elif msg.BMSNumber == BMSOrder.Slave1:
                         self.BMS_Slave1.set_val(msg.name,msg.value,messageTime)

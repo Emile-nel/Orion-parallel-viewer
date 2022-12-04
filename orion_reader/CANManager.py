@@ -17,15 +17,13 @@ else:
 class ManageCan():
 
     # Timerinterval (ms) for reading 
-    TimerInterval = 500
-    isConnected = False
-    isRunning = False
-    MM = MessageManager()
-
- 
+    TimerInterval = 20
 
     def __init__(self):
         #Initiate CAN parameters
+        self.isConnected = False
+        self.isRunning = False
+        self.MM = MessageManager()
         print("Can Manager has been initiated")
 
 
@@ -96,6 +94,7 @@ class ManageCan():
             os.system('sudo ip link set can0 type can bitrate 500000')
             os.system('sudo ifconfig can0 up')
             self.bus = can.interface.Bus(channel = 'can0', bustype = 'socketcan')
+            self.isConnected = True
 
     #Starts the timer repeater that reads the CANBus periodically
     def startCANBusRead(self): #initialize  and start the CANBus reading    
@@ -119,11 +118,14 @@ class ManageCan():
 
     def ReadCAN(self):
         if IS_WINDOWS:
+            #Read CANBus using PEAKCAN USB 
             self.ReadMessages()
         else:
-            print("Read using openCAN")
+            #Read CANBus using RS485 CAN HAT
+            self.ReadMessage_RS485()
         #Update online status of BMS
-        self.MM.updateOnline()
+        #self.MM.updateOnline()
+
     def ReadMessages(self):
         """
         Function for reading PCAN-Basic messages
@@ -156,9 +158,35 @@ class ManageCan():
             self.MM.BMS_Slave1.log_reset(timeStamp)
         if self.MM.BMS_Slave2.isOnline:
             self.MM.BMS_Slave2.log_reset(timeStamp)
-        if self.MM.BMS_Slave3.isOnline:
+        if self.MM.BMS_Slave3.isOnline: 
             self.MM.BMS_Slave3.log_reset(timeStamp)
         
+        
+    def ReadMessage_RS485(self):
+        message = self.bus.recv(0.2)
+        while True:
+            if message:
+                break
+            message = self.bus.recv(0.2)
+
+        try:
+            # if message.arbitration_id == 947:    
+            #     print(list(message.data))
+
+            messageData = list(message.data)
+            messageID = message.arbitration_id
+            message.arbitration_id,message.dlc,messageData,message.timestamp
+            itstimestamp = time.time()
+            #print(message)
+            self.MM.process_message(messageID,messageData,itstimestamp)
+            # messageString =  "{}:ID={}:LEN={}".format("RX", message.arbitration_id, message.dlc)
+            # for x in range(message.dlc):
+            #     messageString += ":{:02x}".format(message.data[x])        
+        #print exception if failed to parse the CAN message into the string.
+        except Exception as e:
+            print("Could not process RS485 CANBus message. Error : {}".format(e))
+            
+
         
 
 

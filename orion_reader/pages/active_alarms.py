@@ -15,7 +15,7 @@ def create_active_alarms(BMS:BMSUnit):
                 className="info_row row justify-content-between",
                 children=[
                     dbc.Col("Error Description", className="col-md-8 info_name"),
-                    dbc.Col("Date Raised",className="col-md-4 info_name", style={"text-align": "center"}),
+                    dbc.Col("Condition",className="col-md-4 info_name", style={"text-align": "center"}),
                 ]
                 ),
     ]
@@ -26,8 +26,8 @@ def create_active_alarms(BMS:BMSUnit):
         alarmRow =  dbc.Row(
                         className="info_row row justify-content-between",
                         children=[
-                            dbc.Col("{}".format(alarm[0]), className="col-md-7 info_name"),
-                            dbc.Col("{}".format(alarm[1]),className="col-md-5 info_name", style={"text-align": "end"}),
+                            dbc.Col("{}".format(alarm[0]), className="col-md-8 info_name"),
+                            dbc.Col("{}".format(alarm[1]),className="col-md-4 info_name", style={"text-align": "center"}),
                         ]
                 )
         rowList.append(alarmRow)

@@ -12,9 +12,11 @@ import dash_bootstrap_components as dbc
 
 
 
-def create_battery_card(BMS : BMSUnit, batteryId : str ):
+def create_parallel_battery_card(BMS : CombinedBMSUnit, batteryId : str ):
     #batteryName,voltage,current,power,soc,isFault,batteryId,isConnected
     
+
+    chargeAllowed = BMS.allowCharge
     batteryName = BMS.BMSName
     voltage = BMS.instantVoltage
     soc = BMS.packSOC
@@ -22,9 +24,7 @@ def create_battery_card(BMS : BMSUnit, batteryId : str ):
     isOnline = BMS.isOnline
     current = BMS.packCurrent
     power = voltage*current
-    
 
-     
      
     absPower = abs(power)
     
@@ -40,12 +40,14 @@ def create_battery_card(BMS : BMSUnit, batteryId : str ):
         soc_string = '{soc} % charging'.format(soc=soc)
     if current <= -1: # Discharging
         soc_string = '{soc} % discharging'.format(soc=soc)
+    
+    
     if isOnline:
         if isFault:
             statusString = "FAULT"
             statusStyle = { "height":"50%", "color" : "red"}
-        elif not BMS.relayState:
-            statusString = "RELAY\nOPEN"
+        elif not chargeAllowed:
+            statusString = "Charge\nDisabled"
             statusStyle = { "height":"50%", "color" : "red"}          
         else:
             statusString = "OK"
